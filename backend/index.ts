@@ -1,9 +1,7 @@
-import Auth from './src/handlers/auth.rpc';
-import Standard from './src/handlers/standard.rpc';
-import Users from './src/handlers/users.rpc';
+import Auth from './src/handlers/auth/auth.rpc';
+import Standard from './src/handlers/general/general.rpc';
 
 export {
     Auth,
     Standard,
-    Users,
 };

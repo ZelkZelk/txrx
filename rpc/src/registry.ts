@@ -1,5 +1,7 @@
 import { Computation, Mapping } from "../types/rpc.types";
 import Handler from "./handler";
+import * as path from 'path';
+import { promises as fsp } from 'fs';
 
 export default class Registry {
     private static registry?: Registry;
@@ -13,14 +15,19 @@ export default class Registry {
             Registry.registry = new Registry(); 
         }
 
-        return Registry.registry;
+        return Registry.registry;   
     }
 
     public async load(): Promise<void> {
-        const backend = await import('backend');
+        const fixedDirectory =  '../../../' + process.env.HANDLERS_DIR!;
+        const handlersDirectory = path.join(__dirname, fixedDirectory);
+        const files = await fsp.readdir(handlersDirectory);
 
-        for await (const module of Object.keys(backend)) {
-            this.handlers.push(new backend[module]());
+        for await (const file of files) {
+            if (/\.(j|t)s$/.test(file)) {
+                const handlerModule = await import(path.join(__dirname, fixedDirectory, file));
+                this.handlers.push(new handlerModule.default());
+            }
         }
     }
 

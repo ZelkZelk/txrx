@@ -1,6 +1,7 @@
 import { Handler, RPC } from "rpc";
 import { Computation } from "rpc/types/rpc.types";
-import { User } from '../storage';
+import { User } from '../../storage';
+import { Allow } from '../../decorators/auth.decorators';
 
 export default class Auth extends Handler {
     @RPC
@@ -71,5 +72,15 @@ export default class Auth extends Handler {
         }
 
         return this.rx(true, ...messages);
+    }
+    
+    @RPC
+    @Allow('ADMIN')
+    public async me(authorized: string): Promise<Computation> {
+        const user = new User();
+        const identity = await user.whoami(authorized);
+        const data = ['you', JSON.stringify(identity)];
+
+        return this.rx(true, data.join('\n'));
     }
 }

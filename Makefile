@@ -37,6 +37,12 @@ rpc:
 	docker image rm tienda-rpc:latest || true
 	docker-compose up -d --force-recreate --build rpc
 
+rpc-auth:
+	docker stop tienda-rpc-auth 			  || true
+	docker rm tienda-rpc-auth 			      || true
+	docker image rm tienda-rpc-auth:latest    || true
+	docker-compose up -d --force-recreate --build rpc-auth
+
 websocket:
 	docker stop tienda-websocket 		    || true
 	docker rm tienda-websocket 			    || true
@@ -61,9 +67,13 @@ all:
 	make redis-p2p
 	make services
 
+rpc-all:
+	make rpc      &
+	make rpc-auth &
+
 services:
 	make dispatcher &
-	make rpc        &
+	make rpc-all    &
 	make ws         &
 
 logs:

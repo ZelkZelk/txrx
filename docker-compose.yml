@@ -50,6 +50,7 @@ services:
         <<: *common-variables
         CONSUMER_GROUP: 'dispatcher'
         CONSUMER: 'd0'
+        P2P_PEER: 'dispatcher'
     networks:
       - bus
       - data
@@ -68,8 +69,32 @@ services:
         <<: *common-variables
         CONSUMER_GROUP: 'rpc'
         CONSUMER: 'r0'
+        P2P_PEER: 'rpc'
         RPC: 'rpc'
-        HANDLERS_DIR: ../../node_modules/backend/src/handlers
+        HANDLERS_DIR: backend/dist/src/handlers/general
+        DATABASE_URL: postgres://postgres@tienda-postgres:5432/tienda
+        REDIS_URL: 'redis://tienda-redis:6379'
+    networks:
+      - bus
+      - data
+      - p2p
+
+  rpc-auth:
+    container_name: tienda-rpc-auth
+    image: tienda-rpc:latest
+    build:
+      context: ./
+      args:
+        - PACKAGE=rpc
+        - DEPS=consumer streamer p2p backend
+    restart: always
+    environment:
+        <<: *common-variables
+        CONSUMER_GROUP: 'rpc'
+        CONSUMER: 'r0'
+        P2P_PEER: 'rpc-auth'
+        RPC: 'auth'
+        HANDLERS_DIR: backend/dist/src/handlers/auth
         DATABASE_URL: postgres://postgres@tienda-postgres:5432/tienda
         REDIS_URL: 'redis://tienda-redis:6379'
     networks:

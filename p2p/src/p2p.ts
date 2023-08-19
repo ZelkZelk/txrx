@@ -27,7 +27,7 @@ export default class P2P {
     }
 
     private peer(): string {
-        return [process.env.CONSUMER!, process.env.CONSUMER_GROUP!].join('@');
+        return  process.env.P2P_PEER!;
     }
 
     public isMe(item: ConsumeItem): boolean {
