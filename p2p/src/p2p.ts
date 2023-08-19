@@ -71,7 +71,7 @@ export default class P2P {
         this.emitter.next(this.mapping);
     }
 
-    public async hello(): Promise<string | null > {
+    public async hello(): Promise<string | null> {
         const message = {
             stream: process.env.P2P!,
             id: '*',
@@ -85,7 +85,7 @@ export default class P2P {
         return this.streamer.stream(message);
     }
 
-    public async init(): Promise<string | null > {
+    public async init(): Promise<string | null> {
         const message = {
             stream: process.env.P2P!,
             id: '*',
@@ -163,7 +163,7 @@ export default class P2P {
             if (!this.initialized) {
                 this.initialized = true;
                 await this.init();
-            } else if (consumable.id === '$') {
+            } else if (consumable.id === '$' && this.mode === P2PMode.LISTENER) {
                 await this.hello();
             }
         }

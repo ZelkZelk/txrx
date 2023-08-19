@@ -26,9 +26,6 @@ export default class Protocol extends Handler {
         if (p2p.runningAs() === P2PMode.BROADCASTER) {
             await p2p.share();
         }
-        else {
-            await p2p.hello();
-        }
     }
 
     @P2PHandler
