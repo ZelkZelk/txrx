@@ -9,7 +9,6 @@ node_clean:
 	rm -rf dispatcher/dist dispatcher/node_modules
 	rm -rf websocket/dist websocket/node_modules
 	rm -rf rpc/dist rpc/node_modules
-	rm -rf data/dist data/node_modules
 	rm -rf streamer/dist streamer/node_modules
 	rm -rf p2p/dist p2p/node_modules
 	rm -rf backend/dist backend/node_modules
@@ -18,7 +17,6 @@ node_clean:
 	cd dispatcher && npm i && cd ..
 	cd websocket && npm i && cd ..
 	cd rpc && npm i && cd ..
-	cd data && npm i && cd ..
 	cd streamer && npm i && cd ..
 	cd p2p && npm i && cd ..
 	cd backend && npm i && cd ..
