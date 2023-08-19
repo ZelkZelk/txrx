@@ -81,7 +81,7 @@ services:
 
   rpc-auth:
     container_name: tienda-rpc-auth
-    image: tienda-rpc:latest
+    image: tienda-rpc-auth:latest
     build:
       context: ./
       args:
