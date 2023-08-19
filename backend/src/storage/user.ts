@@ -184,6 +184,8 @@ export default class User {
             password: await hash(password, 15)
           }
         });
+
+        return [true, null];
       }
     }
 
