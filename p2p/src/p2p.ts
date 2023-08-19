@@ -129,9 +129,9 @@ export default class P2P {
 
     private async run(): Promise<void> {
         const consumable = this.consumable();
-
         while (this.running) {
             const items: ConsumeItem[] = await this.consumer.consume(consumable);
+            consumable.id = Date.now() + '';
 
             for await(const item of items) {
                 try {
@@ -163,8 +163,6 @@ export default class P2P {
             if (!this.initialized) {
                 this.initialized = true;
                 await this.init();
-            } else if (consumable.id === '$' && this.mode === P2PMode.LISTENER) {
-                await this.hello();
             }
         }
     }
