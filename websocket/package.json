@@ -1,0 +1,23 @@
+{
+  "name": "websocket",
+  "version": "1.0.0",
+  "description": "Websocket Serve",
+  "main": "dist/src/server.js",
+  "scripts": {
+    "serve": "node dist/src/server.js",
+    "qa": "npx ts-node qa/client.ts"
+  },
+  "author": "klez",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@types/ws": "^8.5.4",
+    "redis": "^4.6.7",
+    "streamer": "file:../streamer",
+    "consumer": "file:../consumer",
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
+  }
+}

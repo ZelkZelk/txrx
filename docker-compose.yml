@@ -1,0 +1,123 @@
+version: '3.4'
+
+x-common-variables: &common-variables
+  REDIS_BUS: 'redis://tienda-redis:6379'
+  REDIS_P2P: 'redis://tienda-redis-p2p:6379'
+  TX: 'tx'
+  RX: 'rx'
+  P2P: 'p2p'
+  TTL: 600000
+  CONSUMER_BLOCK: 100
+  CONSUMER_COUNT: 1000
+  STREAM_MAXLEN: 500000
+  P2P_MAXLEN: 10000
+  NODE_ENV: development
+
+services:
+  websocket:
+    container_name: tienda-websocket
+    image: tienda-websocket:latest
+    build:
+      context: ./
+      args:
+        - PACKAGE=websocket
+        - DEPS=streamer consumer
+    ports:
+      - '8080:8080'
+    restart: always
+    environment:
+        <<: *common-variables
+        WEBSOCKET_PORT: 8080
+        CONSUMER_GROUP: 'websocket'
+        CONSUMER: 'w0'
+        TX_DELAY: 100
+        THROTTLE_WARNS: 5
+        THROTTLE_MESSAGES: 10
+        THROTTLE_TIME_UNIT: 10000
+    networks:
+      - bus
+
+  dispatcher:
+    container_name: tienda-dispatcher
+    image: tienda-dispatcher:latest
+    build:
+      context: ./
+      args:
+        - PACKAGE=dispatcher
+        - DEPS=consumer streamer p2p
+    restart: always
+    environment:
+        <<: *common-variables
+        CONSUMER_GROUP: 'dispatcher'
+        CONSUMER: 'd0'
+    networks:
+      - bus
+      - data
+      - p2p
+
+  rpc:
+    container_name: tienda-rpc
+    image: tienda-rpc:latest
+    build:
+      context: ./
+      args:
+        - PACKAGE=rpc
+        - DEPS=consumer streamer p2p backend
+    restart: always
+    environment:
+        <<: *common-variables
+        CONSUMER_GROUP: 'rpc'
+        CONSUMER: 'r0'
+        RPC: 'rpc'
+        HANDLERS_DIR: ../../node_modules/backend/src/handlers
+        DATABASE_URL: postgres://postgres@tienda-postgres:5432/tienda
+        REDIS_URL: 'redis://tienda-redis:6379'
+    networks:
+      - bus
+      - data
+      - p2p
+
+  redis:
+    container_name: tienda-redis
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - bus
+
+  redis-p2p:
+    container_name: tienda-redis-p2p
+    image: redis:latest
+    restart: always
+    ports:
+      - 7379:6379
+    networks:
+      - p2p
+
+  postgres:
+    container_name: tienda-postgres
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - data
+
+networks:
+  bus:
+    name: tienda-bus
+  data:
+    name: tienda-data
+  p2p:
+    name: tienda-p2p
+
+volumes:
+  postgres:
+    driver: local

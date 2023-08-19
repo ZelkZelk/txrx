@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.playground {
+    width: 100%;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+
+    .SplitPane.vertical {
+        display: flex; 
+        flex: 1 1 0%; 
+        height: 100%; 
+        position: absolute; 
+        outline: none; 
+        overflow: hidden; 
+        flex-direction: row; 
+        left: 0px; 
+        right: 0px;
+
+        .Pane1.vertical {
+            flex: 0 0 auto; 
+            position: relative; 
+            outline: none; 
+            width: 50%; 
+            margin-top: -1px; 
+            display: flex; 
+            flex-direction: column;
+    
+            textarea {
+                width: 100%;
+                height: 100%;
+                border: 0;
+                outline: none;
+                resize: none;
+            }
+        }
+
+        .Pane2.vertical {
+            flex: 0 0 auto; 
+            position: relative; 
+            outline: none;
+            width: 50%; 
+            margin-top: -1px; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .SplitPane.horizontal {
+            display: flex; 
+            flex: 1 1 0%; 
+            height: 100%; 
+            position: absolute; 
+            outline: none; 
+            overflow: hidden; 
+            bottom: 0px; 
+            flex-direction: column; 
+            min-height: 100%; 
+            top: 0px; 
+            width: 100%;
+        }
+
+        .Pane1.horizontal {
+            flex: 1 1 0%;
+            position: relative; 
+            outline: none; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .Pane2.horizontal {
+            flex: 0 0 auto; 
+            position: relative; 
+            outline: none; 
+            height: 48px; 
+            display: flex;
+        }
+
+        .Pane0.horizontal {
+            flex: 0 0 auto; 
+            position: relative; 
+            outline: none; 
+            display: flex;
+        }
+    }
+}

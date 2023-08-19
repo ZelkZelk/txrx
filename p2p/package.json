@@ -1,0 +1,17 @@
+{
+  "name": "data",
+  "version": "1.0.0",
+  "description": "P2P Discovery",
+  "main": "dist/index.js",
+  "author": "klez",
+  "license": "ISC",
+  "dependencies": {
+    "consumer": "file:../consumer",
+    "streamer": "file:../streamer",
+    "rxjs": "^7.8.1",
+    "typescript": "^5.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5"
+  }
+}

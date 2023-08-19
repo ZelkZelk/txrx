@@ -1,0 +1,21 @@
+{
+  "name": "dispatcher",
+  "version": "1.0.0",
+  "description": "Websocket Request Dispatcher",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "serve": "node dist/src/index.js"
+  },
+  "author": "klez",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@types/ws": "^8.5.4",
+    "consumer": "file:../consumer",
+    "p2p": "file:../p2p",
+    "rxjs": "^7.8.1",
+    "streamer": "file:../streamer"
+  }
+}

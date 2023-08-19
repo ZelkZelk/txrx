@@ -1,0 +1,17 @@
+{
+  "name": "data",
+  "version": "1.0.0",
+  "description": "Data Layer",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "serve": "node dist/src/index.js"
+  },
+  "author": "klez",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5"
+  }
+}
