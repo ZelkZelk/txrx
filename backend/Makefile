@@ -1,5 +1,5 @@
 psql:
-	psql -Atx postgres://postgres@127.0.0.1:5432/tienda
+	psql -Atx postgres://postgres@127.0.0.1:5432/txrx
 
 psql-nodb:
 	psql -Atx postgres://postgres@127.0.0.1:5432

@@ -26,27 +26,27 @@ ws:
 	docker-compose up -d --force-recreate --build websocket
 
 dispatcher:
-	docker stop tienda-dispatcher 			 || true
-	docker rm tienda-dispatcher 			 || true
-	docker image rm tienda-dispatcher:latest || true
+	docker stop txrx-dispatcher 			 || true
+	docker rm txrx-dispatcher 			 || true
+	docker image rm txrx-dispatcher:latest || true
 	docker-compose up -d --force-recreate --build dispatcher
 
 rpc:
-	docker stop tienda-rpc 			  || true
-	docker rm tienda-rpc 			  || true
-	docker image rm tienda-rpc:latest || true
+	docker stop txrx-rpc 			  || true
+	docker rm txrx-rpc 			  || true
+	docker image rm txrx-rpc:latest || true
 	docker-compose up -d --force-recreate --build rpc
 
 rpc-auth:
-	docker stop tienda-rpc-auth 			  || true
-	docker rm tienda-rpc-auth 			      || true
-	docker image rm tienda-rpc-auth:latest    || true
+	docker stop txrx-rpc-auth 			  || true
+	docker rm txrx-rpc-auth 			      || true
+	docker image rm txrx-rpc-auth:latest    || true
 	docker-compose up -d --force-recreate --build rpc-auth
 
 websocket:
-	docker stop tienda-websocket 		    || true
-	docker rm tienda-websocket 			    || true
-	docker image rm tienda-websocket:latest || true
+	docker stop txrx-websocket 		    || true
+	docker rm txrx-websocket 			    || true
+	docker image rm txrx-websocket:latest || true
 	docker-compose up -d --force-recreate --build websocket
 
 redis:
@@ -56,8 +56,8 @@ redis-p2p:
 	docker-compose up -d redis-p2p
 
 redis-flush:
-	docker exec tienda-redis redis-cli flushall
-	docker exec tienda-redis-p2p redis-cli flushall
+	docker exec txrx-redis redis-cli flushall
+	docker exec txrx-redis-p2p redis-cli flushall
 
 postgres:
 	docker-compose up -d postgres

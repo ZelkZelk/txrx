@@ -2,15 +2,15 @@
   "development": {
     "username": "postgres",
     "password": null,
-    "database": "tienda",
+    "database": "txrx",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
     "password": null,
-    "database": "tienda",
-    "host": "tienda-postgres",
+    "database": "txrx",
+    "host": "txrx-postgres",
     "dialect": "postgres"
   }
 }

@@ -1,8 +1,8 @@
 version: '3.4'
 
 x-common-variables: &common-variables
-  REDIS_BUS: 'redis://tienda-redis:6379'
-  REDIS_P2P: 'redis://tienda-redis-p2p:6379'
+  REDIS_BUS: 'redis://txrx-redis:6379'
+  REDIS_P2P: 'redis://txrx-redis-p2p:6379'
   TX: 'tx'
   RX: 'rx'
   P2P: 'p2p'
@@ -15,8 +15,8 @@ x-common-variables: &common-variables
 
 services:
   websocket:
-    container_name: tienda-websocket
-    image: tienda-websocket:latest
+    container_name: txrx-websocket
+    image: txrx-websocket:latest
     build:
       context: ./
       args:
@@ -38,8 +38,8 @@ services:
       - bus
 
   dispatcher:
-    container_name: tienda-dispatcher
-    image: tienda-dispatcher:latest
+    container_name: txrx-dispatcher
+    image: txrx-dispatcher:latest
     build:
       context: ./
       args:
@@ -57,8 +57,8 @@ services:
       - p2p
 
   rpc:
-    container_name: tienda-rpc
-    image: tienda-rpc:latest
+    container_name: txrx-rpc
+    image: txrx-rpc:latest
     build:
       context: ./
       args:
@@ -72,16 +72,16 @@ services:
         P2P_PEER: 'rpc'
         RPC: 'rpc'
         HANDLERS_DIR: backend/dist/src/handlers/general
-        DATABASE_URL: postgres://postgres@tienda-postgres:5432/tienda
-        REDIS_URL: 'redis://tienda-redis:6379'
+        DATABASE_URL: postgres://postgres@txrx-postgres:5432/txrx
+        REDIS_URL: 'redis://txrx-redis:6379'
     networks:
       - bus
       - data
       - p2p
 
   rpc-auth:
-    container_name: tienda-rpc-auth
-    image: tienda-rpc-auth:latest
+    container_name: txrx-rpc-auth
+    image: txrx-rpc-auth:latest
     build:
       context: ./
       args:
@@ -95,15 +95,15 @@ services:
         P2P_PEER: 'rpc-auth'
         RPC: 'auth'
         HANDLERS_DIR: backend/dist/src/handlers/auth
-        DATABASE_URL: postgres://postgres@tienda-postgres:5432/tienda
-        REDIS_URL: 'redis://tienda-redis:6379'
+        DATABASE_URL: postgres://postgres@txrx-postgres:5432/txrx
+        REDIS_URL: 'redis://txrx-redis:6379'
     networks:
       - bus
       - data
       - p2p
 
   redis:
-    container_name: tienda-redis
+    container_name: txrx-redis
     image: redis:latest
     restart: always
     ports:
@@ -112,7 +112,7 @@ services:
       - bus
 
   redis-p2p:
-    container_name: tienda-redis-p2p
+    container_name: txrx-redis-p2p
     image: redis:latest
     restart: always
     ports:
@@ -121,7 +121,7 @@ services:
       - p2p
 
   postgres:
-    container_name: tienda-postgres
+    container_name: txrx-postgres
     image: postgres
     restart: always
     environment:
@@ -137,11 +137,11 @@ services:
 
 networks:
   bus:
-    name: tienda-bus
+    name: txrx-bus
   data:
-    name: tienda-data
+    name: txrx-data
   p2p:
-    name: tienda-p2p
+    name: txrx-p2p
 
 volumes:
   postgres:
