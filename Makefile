@@ -22,8 +22,8 @@ node_clean:
 	cd backend && npm i && cd ..
 	cd frontend && npm i && cd ..
 
-ws:
-	docker-compose up -d --force-recreate --build websocket
+stop:
+	docker-compose stop
 
 dispatcher:
 	docker stop txrx-dispatcher 			 || true
@@ -74,7 +74,7 @@ rpc-all:
 services:
 	make dispatcher &
 	make rpc-all    &
-	make ws         &
+	make websocket  &
 
 logs:
 	docker-compose logs --tail=0 --follow

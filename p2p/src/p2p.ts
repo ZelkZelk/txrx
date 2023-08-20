@@ -129,9 +129,10 @@ export default class P2P {
 
     private async run(): Promise<void> {
         const consumable = this.consumable();
+        const startAt = Date.now() - parseInt(process.env.TTL!);
+
         while (this.running) {
             const items: ConsumeItem[] = await this.consumer.consume(consumable);
-            consumable.id = Date.now() + '';
 
             for await(const item of items) {
                 try {
@@ -161,6 +162,7 @@ export default class P2P {
             }
 
             if (!this.initialized) {
+                consumable.id = startAt + '';
                 this.initialized = true;
                 await this.init();
             }
