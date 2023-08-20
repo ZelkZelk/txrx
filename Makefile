@@ -25,6 +25,9 @@ node_clean:
 stop:
 	docker-compose stop
 
+start:
+	docker-compose start
+
 dispatcher:
 	docker stop txrx-dispatcher 			 || true
 	docker rm txrx-dispatcher 			 || true
