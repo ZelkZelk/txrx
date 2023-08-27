@@ -39,7 +39,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        include: path.resolve(__dirname, 'assets/css'),
+        include: path.resolve(__dirname, 'assets'),
         use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
     ],
@@ -48,11 +48,16 @@ module.exports = {
     static: {
         directory: path.join(__dirname, 'dist'),
     },
-    historyApiFallback: true,
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/backoffice\/(.*)$/, to: '/backoffice' },
+      ],
+    },
     host: '0.0.0.0',
+    port: 3000,
     compress: true,
     hot: true,
-    port: 3000,
+    static: './',
     devMiddleware: {
         publicPath: '/',
     }

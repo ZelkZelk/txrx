@@ -26,6 +26,10 @@ export default class Client {
         return this.ws;
     }
 
+    public close() {
+        this.ws.close();
+    }
+
     public send(message: string) {
         this.ws.send(message);
     }

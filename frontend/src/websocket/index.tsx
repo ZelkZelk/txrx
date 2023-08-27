@@ -5,9 +5,12 @@ import { Subscription } from 'rxjs';
 import { IWebSocketApp, WebSocketEventType, WebSocketUpdate } from '../../types/websocket.types';
 import WebSocket from 'isomorphic-ws';
 import { PropsWithChildren } from 'react'
+import { createState } from 'state-pool';
+
+const theClient = createState<Client>(null);
 
 export default (props: IWebSocketApp) => {
-    const [client, setClient] = useState<Client>() as [Client, Function];
+    const [client, setClient] = theClient.useState();
     const [subscription, setSubscription] = useState<Subscription>() as [Subscription, Function];
     const [connection, setConnection] = useState<WebSocket>() as [WebSocket, Function];
     const propsWithChildren = props as PropsWithChildren<IWebSocketApp>;

@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@config '../playground/tailwind.config.js';
 
 .playground {
     width: 100%;
