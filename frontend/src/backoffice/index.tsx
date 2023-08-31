@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import WebSocketApp from '../websocket';
 import { Transmission } from '../../types/websocket.types';

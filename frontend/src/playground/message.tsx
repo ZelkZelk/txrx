@@ -1,4 +1,3 @@
-import React from 'react';
 import { IPlaygroundMessage, PlaygroundMessageType } from '../../types/playground.types';
 
 export default (props: IPlaygroundMessage) => {

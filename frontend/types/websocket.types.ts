@@ -22,6 +22,7 @@ export type IWebSocketApp = {
     onOpen: (event: WebSocket.Event) => void;
     onMessage: (event: WebSocket.MessageEvent) => void;
     onError: (event: WebSocket.ErrorEvent) => void;
+    children: React.ReactNode;
 };
 
 export type Transmission = {

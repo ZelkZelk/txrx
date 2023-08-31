@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 import WebSocketApp from '../websocket';
@@ -13,7 +12,7 @@ export default ({ url }) => {
     const [message, setMessage] = useState<string>('') as [string, Function];
     const [logs, setLogs] = useState([] as PlaygroundMessage[]) as [PlaygroundMessage[], Function];
     const logPanel = useRef(null);
-    const autoPongRef = useRef();
+    const autoPongRef = useRef<boolean>();
     autoPongRef.current = autoPong;
 
     useEffect(() => {

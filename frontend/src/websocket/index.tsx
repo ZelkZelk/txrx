@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import Client from '../websocket/client';
 import { Subscription } from 'rxjs';
