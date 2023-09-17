@@ -106,7 +106,7 @@ The project offers a boilerplate `backend` and `frontend` to start with, the ide
 The boilerplate `backend` offers:
 
 - General `rpc handlers`
-- Auth `rpc handlers`, with basic calls implemented such as: login, logout, etc
+- Auth `rpc handlers`, such as login, logout, etc
 - Ready to use `decorators` riced with `p2p` capabilities
 - PostgreSQL database support
 - Migrations and Database seeders
@@ -121,3 +121,25 @@ The boilerplate `frontend` offers:
 - Tailwind
 - A `playground` page to poke the websocket
 - An incomplete `backoffice` with just basic sign in/out capabilities
+
+## Ecosystem
+
+You might have noticed this is a `monorepo` of sorts. The `docker-compose` is built in a way that bundles all together without many hassle.
+
+In order to properly function, each container will only include the dependencies it really needs from the `monorepo` package collection.
+
+Since all the dependencies are internally resolved, `ejection` from the core becomes trivial, letting us bring a collection of boilerplate `rpc handlers` aka the `backend`. As a nice side effect, this also let you deploy many `rpc containers` to separate your architecture into a myriad of specific domain `rpc`.
+
+Generally speaking, as a baseline you will need:
+
+- one unit of `websocket`, this is the only true `singleton` service
+- one unit of `dispatcher`, although it can be horizontally scaled by adding more consumers to its `consuming group`
+- one unit of `rpc`, if you wish you can `monolith` your rpc up, however the architecture let you both `separate` into domain specific rpc and also horizontally scale by adding more consumers.
+
+**Note:** the `boileplate` run aways from a `monolithic` rpc from the get go by separating the `auth handlers`.
+
+## Getting started
+
+We recommend to check out the instuctions at the [ToxRox Ejector Project](https://github.com/ZelkZelk/txrx-ejector).
+
+By following its instructions, you will get an `ejected` ToxRox project ready to build upon.
