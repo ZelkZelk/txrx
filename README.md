@@ -62,15 +62,27 @@ sequenceDiagram
     RedisP2P-->>Dispatcher: share
 ```
 
-**Note:** if the `dispatcher` don't know where to stream an incoming message it won't acknowledge it.
+**Note:** if the `dispatcher` didn't know where to stream an incoming message it won't acknowledge it.
 
 **Note:** the `dispatcher` will automatically reprocess not acknowledged messages each time a new `shard` is received.
 
 ### RPC separation
 
-By subscribing to the `p2p` network the `dispatcher` will always know where to put the incoming message in order to get properly consumed. This lets you deploy many separate `rpc` that could `handle` specific domains of your overall system.
+By subscribing to the `p2p` network the `dispatcher` will always know where to put the incoming message in order to get properly consumed. This lets you deploy many separate `rpc` that could `handle` specific domains of your system on the fly, no need to restart whe `dispatcher` nor the `websocket`.
 
+```mermaid
+flowchart TD
+    A[Incoming Message] --> B(dispatcher)
+    B --> C{Resolve from P2P shards}
+    C -->|login| D[Auth RPC]
+    C -->|logout| D[Auth RPC]
+    C -->|time| E[General RPC]
+    C -->|buy| F[Ecommerce RPC]
+    C -->|send_email| G[Mailer RPC]
+    C -->|unknown| I[NOACK]
+```
 
+**Note:** by implementing consuming groups, your `rpc` can easily horizontally scale.
 
 ## Packages
 
@@ -80,7 +92,7 @@ Each package play a key role in the architecture.
 - **streamer:** Redis streams feeder
 - **websocket:** the architecture's `websocket`
 - **disatcher:** the architecture's `dispatcher`
-- **rpc:** the architecture's `rpc`
+- **rpc:** the architecture's `rpc` core
 - **p2p:** the `p2p` network implementation
 - **backend:** boilerplate `rpc handlers`
 - **frontend:** boilerplate `playground` and `backoffice`
