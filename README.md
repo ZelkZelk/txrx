@@ -35,7 +35,7 @@ Additionaly, each `rpc` is responsible to let know the `dispatcher` what message
 
 ### P2P network
 
-When the `dispatcher` initializes a `init` message is broadcasted, letting know all the online peers a new peer has become online needing all the `shards` from its peers to properly function. Each online `rpc` will dispatch the init message by broadcasting the `share` message including its own shard, carrying all the info about the messages it can consume.
+When the `dispatcher` initializes, a `init` message is broadcasted, letting all the online peers know a new peer has become online needing all the `shards` from its peers to properly function. Each online `rpc` will dispatch the init message by broadcasting the `share` message including its own shard, carrying all the info about the messages it can consume.
 
 ```mermaid
 sequenceDiagram
@@ -106,7 +106,7 @@ The project offers a boilerplate `backend` and `frontend` to start with, the ide
 The boilerplate `backend` offers:
 
 - General `rpc handlers`
-- Auth `rpc handlers`, with basic calls implemented like login, logout, etc
+- Auth `rpc handlers`, with basic calls implemented such as: login, logout, etc
 - Ready to use `decorators` riced with `p2p` capabilities
 - PostgreSQL database support
 - Migrations and Database seeders
