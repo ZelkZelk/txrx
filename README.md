@@ -40,9 +40,9 @@ When the `dispatcher` initializes a `init` message is broadcasted, letting know 
 ```mermaid
 sequenceDiagram
     Dispatcher->>RedisP2P: XADD P2P init
-    RPC->>RedisP2P: XREAD P2P
+    RPC-->>RedisP2P: XREAD P2P
     RedisP2P-->>RPC: init
-    RPC-->>RedisP2P: XADD P2P share
+    RPC->>RedisP2P: XADD P2P share
     Dispatcher-->>RedisP2P: XREAD P2P
     RedisP2P-->>Dispatcher: share
 ```
