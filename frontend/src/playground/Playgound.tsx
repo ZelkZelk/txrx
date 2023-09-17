@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
-import WebSocketApp from '../websocket';
-import Message from './message';
+import WebSocketApp from '../websocket/WebsocketApp';
+import Message from './Message';
 import WebSocket from 'isomorphic-ws';
 import { PlaygroundMessage, PlaygroundMessageType } from '../../types/playground.types';
 import { Transmission } from '../../types/websocket.types';
 
 export default ({ url }) => {
-    const [autoPong, setAutoPong] = useState<boolean>(true) as [boolean, Function];
-    const [tx, setTx] = useState<Transmission>() as [Transmission, Function];
-    const [message, setMessage] = useState<string>('') as [string, Function];
-    const [logs, setLogs] = useState([] as PlaygroundMessage[]) as [PlaygroundMessage[], Function];
+    const [autoPong, setAutoPong] = useState<boolean>(true) as [boolean, Dispatch<SetStateAction<boolean>>];
+    const [tx, setTx] = useState<Transmission>() as [Transmission, Dispatch<SetStateAction<Transmission>>];
+    const [message, setMessage] = useState<string>('') as [string, Dispatch<SetStateAction<string>>];
+    const [logs, setLogs] = useState([] as PlaygroundMessage[]) as [PlaygroundMessage[], Dispatch<SetStateAction<PlaygroundMessage[]>>];
     const logPanel = useRef(null);
     const autoPongRef = useRef<boolean>();
     autoPongRef.current = autoPong;
@@ -87,7 +87,7 @@ export default ({ url }) => {
             }
         }
 
-        setLogs(current => [...current, [type, event.data]]);
+        setLogs(current => [...current, [type, event.data.toString()]]);
 
         if (pong) {
             setTx({ 

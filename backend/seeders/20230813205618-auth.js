@@ -4,7 +4,7 @@
 module.exports = {
   async up (queryInterface, _Sequelize) {
     const bcrypt = await import('bcrypt');
-    const password = await bcrypt.hash('Abcd1234', 15);
+    const password = await bcrypt.hash('12345', 15);
 
     return queryInterface.bulkInsert({
       tableName: 'roles',

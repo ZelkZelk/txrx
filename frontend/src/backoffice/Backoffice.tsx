@@ -1,17 +1,22 @@
-import { useState, useEffect } from 'react';
-import WebSocketApp from '../websocket';
-import { Transmission } from '../../types/websocket.types';
-import { IBackOfficeProps } from '../../types/backoffice.types';
+import { useEffect, useState } from 'react';
+import WebSocketApp from '../websocket/WebsocketApp';
+import { Authorized, IBackOfficeProps } from '../../types/backoffice.types';
 import WebSocket from 'isomorphic-ws';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { Reception, Transmission } from '../../types/websocket.types';
 
 export default (props: IBackOfficeProps) => {
-    const [tx, setTx] = useState<Transmission>() as [Transmission, Function];
-    const [auth] = props.auth.useState();
+    const [auth, setAuth] = useState<Authorized>(null);
+    const [tx, setTx] = useState<Transmission>();
+    const [rx, setRx] = useState<Reception>();
     const navigate = useNavigate();
-  
+    
+    useEffect(() => { 
+        setAuth(props.auth)
+    }, [props.auth]);
+
     useEffect(() => {
-      if (auth) {
+      if (auth) {  
         navigate('dashboard');
       } else {
         navigate('login');
@@ -40,15 +45,21 @@ export default (props: IBackOfficeProps) => {
                 timestamp: Date.now(),
             });   
         }
+        else {
+            setRx({
+                message: event.data.toString(),
+                timestamp: Date.now(),
+            });
+        }
     }
 
     function onWebSocketError(_event: WebSocket.ErrorEvent) {
         console.log(_event);
     }
-    
+
     return (
         <WebSocketApp tx={tx} url={props.url} onClose={onWebSocketClose} onError={onWebSocketError} onMessage={onWebSocketMessage} onOpen={onWebSocketOpen}>
-            <Outlet></Outlet>
+            <Outlet context={{ setTx, rx, auth: props.auth, setAuth: props.setAuth }}></Outlet>
         </WebSocketApp>
     );
 };

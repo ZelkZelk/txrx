@@ -29,3 +29,8 @@ export type Transmission = {
     message: string;
     timestamp: number;
 };
+
+export type Reception = {
+    message: string;
+    timestamp: number;
+};

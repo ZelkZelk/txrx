@@ -1,5 +1,5 @@
 export default () => {
     return (
-        <>login!</>
-    )
+        <p>dashboard!</p>
+    );
 };

@@ -14,4 +14,4 @@ export type IPlaygroundMessage = {
     message: string;
     type: PlaygroundMessageType;
     key?: string;
-}
+};
