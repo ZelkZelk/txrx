@@ -6,7 +6,8 @@ import { Allow } from '../../decorators/auth.decorators';
 export default class Auth extends Handler {
     @RPC
     public async login(data: string, conn: string): Promise<Computation> {
-        const [_, handle, password] = data.split(' ');
+        const [_, handle, ...rest] = data.split(' ');
+        const password = rest.join(' ');
         const messages: string[] = [];
         const user = new User();
         const authorized: string[] = await user.login(handle, password);
@@ -54,7 +55,8 @@ export default class Auth extends Handler {
 
     @RPC
     public async resetPassword(data: string): Promise<Computation> {
-        const [_, handle, pin, password] = data.split(' ');
+        const [_, handle, pin, ...rest] = data.split(' ');
+        const password = rest.join(' ');
         const messages: string[] = [];
 
         const user = new User();
@@ -71,6 +73,23 @@ export default class Auth extends Handler {
             }
         }
 
+        return this.rx(true, ...messages);
+    }
+
+    @RPC
+    public async authorize(data: string, conn: string): Promise<Computation> {
+        const [_, handle, token] = data.split(' ');
+        const messages: string[] = [];
+        const user = new User();
+        const authorized: string[] = await user.otl(conn, handle, token);
+
+        if (authorized.length > 0) {
+            messages.push(['authorized', ...authorized].join(' '));
+        }
+        else {
+            messages.push(['unauthorized', ...await user.deauthorize(handle, conn)].join(' '));
+        }
+        
         return this.rx(true, ...messages);
     }
     

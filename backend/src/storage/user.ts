@@ -78,6 +78,37 @@ export default class User {
     return redis.del(AUTH_PREFIX + conn);
   }
 
+  public async otl(conn: string, handle: string, token: string): Promise<string[]> {
+    const canLogin = await this.canLogin(handle);
+
+    if(!canLogin) {
+      return [];  
+    }
+
+    const authorized = await this.whois(token);
+
+    if (authorized.length > 0) {
+      const [id] = authorized;
+      const user = await this.whoami(id);
+
+      if (user && user.handle === handle) {
+        const expires = Date.now() + AUTH_TTL + '';
+        
+        await redis.multi()
+          .del(AUTH_PREFIX + token)
+          .set(AUTH_PREFIX + conn, authorized.join(' '))
+          .pexpireat(AUTH_PREFIX + conn, expires)
+          .exec();
+
+        authorized.shift();
+        authorized.unshift(conn);
+        authorized.unshift(expires);
+      }
+    }
+
+    return authorized;
+  }
+
   public async authorize(conn: string, authorized: string[]): Promise<string[]> {
     const expires = Date.now() + AUTH_TTL + '';
 
@@ -87,7 +118,7 @@ export default class User {
         .exec();
 
     authorized.shift();
-
+    authorized.unshift(conn);
     authorized.unshift(expires);
     
     return authorized;
@@ -118,7 +149,7 @@ export default class User {
     return deauthorize;
   }
 
-  private async canLogin(handle: string, password: string): Promise<boolean> {
+  private async canLogin(handle: string, password: string = 'dummy'): Promise<boolean> {
     if (!handle || !password) {
       return false;
     }
