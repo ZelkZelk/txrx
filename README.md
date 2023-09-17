@@ -18,10 +18,10 @@ sequenceDiagram
     Websocket->>Redis: XADD TX hello
     Dispatcher-->>Redis: XREADGROUP TX
     Redis-->>Dispatcher: hello
-    Dispatcher-->>Redis: XADD RPC hello
+    Dispatcher->>Redis: XADD RPC hello
     RPC-->>Redis: XREADGROUP RPC
     Redis-->>RPC: hello
-    RPC-->>Redis: XADD RX hi
+    RPC->>Redis: XADD RX hi
     Websocket-->>Redis: XREADGROUP RX
     Redis-->>Websocket: hi
     Websocket-->>Frontend: hi
@@ -52,12 +52,12 @@ If a `rpc` becomes online at any given point, it will also broadcast an `init` m
 ```mermaid
 sequenceDiagram
     RPC->>RedisP2P: XADD P2P init
-    Dispatcher->>RedisP2P: XREAD P2P
+    Dispatcher-->>RedisP2P: XREAD P2P
     RedisP2P-->>Dispatcher: init
-    Dispatcher-->>RedisP2P: XADD P2P hello
+    Dispatcher->>RedisP2P: XADD P2P hello
     RPC-->>RedisP2P: XREAD P2P
     RedisP2P-->>RPC: hello
-    RPC-->>RedisP2P: XADD P2P share
+    RPC->>RedisP2P: XADD P2P share
     Dispatcher-->>RedisP2P: XREAD P2P
     RedisP2P-->>Dispatcher: share
 ```
