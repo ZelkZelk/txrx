@@ -68,7 +68,7 @@ sequenceDiagram
 
 ### RPC separation
 
-By subscribing to the `p2p` network the `dispatcher` will always know where to put the incoming message in order to get properly consumed. This lets you deploy many separate `rpc` that could `handle` specific domains of your system on the fly, no need to restart whe `dispatcher` nor the `websocket`.
+By subscribing to the `p2p` network the `dispatcher` will always know where to put the incoming message in order to get properly consumed. This lets you deploy many separate `rpc` that could `handle` specific domains of your system on the fly, no need to restart the `dispatcher` nor the `websocket`.
 
 ```mermaid
 flowchart TD
