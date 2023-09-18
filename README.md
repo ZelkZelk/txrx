@@ -136,7 +136,7 @@ Generally speaking, as a baseline you will need:
 - one unit of `dispatcher`, although it can be horizontally scaled by adding more consumers to its `consuming group`
 - one unit of `rpc`, if you wish you can `monolith` your rpc up, however the architecture let you both `separate` into domain specific rpc and also horizontally scale by adding more consumers.
 
-**Note:** the `boilerplate` run aways from a `monolithic` rpc from the get go by separating the `auth handlers`.
+**Note:** the `boilerplate` runs away from a `monolithic` rpc from the get go by separating the `auth handlers`.
 
 ## Getting started
 
