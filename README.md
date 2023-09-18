@@ -140,6 +140,6 @@ Generally speaking, as a baseline you will need:
 
 ## Getting started
 
-We recommend to check out the instuctions at the [ToxRox Ejector Project](https://github.com/ZelkZelk/txrx-ejector).
+We recommend to check out the instructions at the [ToxRox Ejector Project](https://github.com/ZelkZelk/txrx-ejector). 
 
-By following its instructions, you will get an `ejected` ToxRox project ready to build upon.
+By following the ejector `setup`, you will get an `ejected` **ToxRox** project ready to build upon.
