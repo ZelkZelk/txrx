@@ -4,11 +4,13 @@ import { Authorized, IBackOfficeProps } from '../../types/backoffice.types';
 import WebSocket from 'isomorphic-ws';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Reception, Transmission } from '../../types/websocket.types';
+import ClosedLayout from './layout/ClosedLayout';
 
 export default (props: IBackOfficeProps) => {
     const [auth, setAuth] = useState<Authorized>(null);
     const [tx, setTx] = useState<Transmission>();
     const [rx, setRx] = useState<Reception>();
+    const [closed, setClosed] = useState<boolean>(false);
     const navigate = useNavigate();
     
     useEffect(() => { 
@@ -16,18 +18,21 @@ export default (props: IBackOfficeProps) => {
     }, [props.auth]);
 
     useEffect(() => {
-      if (auth) {  
-        navigate('dashboard');
-      } else {
-        navigate('login');
-      }
+        if (auth) {  
+            navigate('dashboard');
+        }
+        else {
+            navigate('login');
+        }
     }, [auth]);
 
-    function onWebSocketClose(_event: WebSocket.CloseEvent) {
+    function onWebSocketClose(_event: WebSocket.CloseEvent) {        
+        setClosed(true);
         console.log(_event);
     }
 
     function onWebSocketOpen(_event: WebSocket.Event) {
+        setClosed(false);
         console.log(_event);
     }
 
@@ -57,7 +62,7 @@ export default (props: IBackOfficeProps) => {
         console.log(_event);
     }
 
-    return (
+    return closed ? (<ClosedLayout />) : (
         <WebSocketApp tx={tx} url={props.url} onClose={onWebSocketClose} onError={onWebSocketError} onMessage={onWebSocketMessage} onOpen={onWebSocketOpen}>
             <Outlet context={{ setTx, rx, auth: props.auth, setAuth: props.setAuth }}></Outlet>
         </WebSocketApp>

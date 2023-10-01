@@ -11,7 +11,7 @@ const theClient = createState<Client>(null);
 
 export default (props: IWebSocketApp) => {
     const [client, setClient] = theClient.useState();
-    const [_, setInit] = useState(false);
+    const [init, setInit] = useState(false);
     const [open, setOpen] = useState(false);
     const [subscription, setSubscription] = useState<Subscription>();
     const [connection, setConnection] = useState<WebSocket>();
@@ -19,28 +19,9 @@ export default (props: IWebSocketApp) => {
 
     if (!client) {
         setClient(Client.get(props.url));
-        setInit(true);
-    } else {
-        if (!subscription) {
-            setSubscription(client.subscribe(websocketUpdate));
-        } else if (!connection) {
-            setConnection(client.connect());
-        } else if (!open) {
-            setOpen(true);
-        }
     }
 
-    useEffect(() => {
-        if (props.tx) {
-            if (props.tx.message.length > 0) {
-                if (client) {
-                    client.send(props.tx.message);
-                }
-            }
-        }
-    }, [props.tx, subscription]);
-
-    function websocketUpdate(update: WebSocketUpdate) {
+    const websocketUpdate = (update: WebSocketUpdate): void => {
         const [type, event] = update;
 
         switch (type) {
@@ -55,7 +36,33 @@ export default (props: IWebSocketApp) => {
             case WebSocketEventType.MESSAGE:
                 return props.onMessage(event as WebSocket.MessageEvent);
         }
-    }
+    };
+
+    useEffect(() => {
+        if (!init) {
+            setInit(true);
+        } else {
+            if (!subscription) {
+                setSubscription(client.subscribe((update: WebSocketUpdate) => {
+                    websocketUpdate(update);
+                }));
+            } else if (!connection) {
+                setConnection(client.connect());
+            } else if (!open) {
+                setOpen(true);
+            }
+        }
+    }, [init, subscription, connection, open]);
+
+    useEffect(() => {
+        if (props.tx) {
+            if (props.tx.message.length > 0) {
+                if (client) {
+                    client.send(props.tx.message);
+                }
+            }
+        }
+    }, [props.tx, subscription]);
 
     return open ? (
         <>{propsWithChildren.children}</>

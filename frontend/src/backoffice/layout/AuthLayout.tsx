@@ -11,7 +11,7 @@ export default () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [authState, setAuthState] = useState<AuthState>(AuthState.NOTHING);
 
-    useEffect(() => {
+    const transition = (): NodeJS.Timeout => {
         let timeout: NodeJS.Timeout;
 
         switch(authState) {
@@ -46,6 +46,28 @@ export default () => {
                 return;
         }
 
+        return timeout;
+    };
+
+    const retry = () => {
+        switch(authState) {
+            case AuthState.AUTHORIZING:
+                setAuthState(AuthState.AUTHORIZE);
+                return;
+            case AuthState.VALIDATE:
+                setAuthState(AuthState.AUTHORIZE);
+                return;
+            case AuthState.VALIDATING:
+                setAuthState(AuthState.VALIDATE);
+                return;
+        }
+
+        setAuthState(AuthState.NOTHING);
+    };
+
+    useEffect(() => {
+        let timeout = transition();
+
         return () => {
             if (timeout) {
                 clearTimeout(timeout);
@@ -53,7 +75,9 @@ export default () => {
         };
     }, [authState]);
 
-    useEffect(() => {
+    useEffect(() => {       
+        let timeout: NodeJS.Timeout;
+
         if (rx) {
             if(rx.message.match(/^unauthorized\s/)) {
                 setAuth(null);
@@ -83,7 +107,21 @@ export default () => {
                 setAuth(freshAuth);
                 setAuthState(AuthState.AUTHORIZED);
             }
+            else if(rx.message.match(/^throttle\s/)){
+                const [_, until] = rx.message.split(' ');
+                const delay = 1 + parseInt(until) - Date.now();
+
+                timeout = setTimeout(() => {
+                    retry();
+                }, delay);
+            }
         }
+
+        return () => {
+          if (timeout) {
+            clearTimeout(timeout);
+          }
+        };
     }, [rx]);
 
     return authState === AuthState.COMPLETED && auth?.user ? (

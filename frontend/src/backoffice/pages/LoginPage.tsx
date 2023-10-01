@@ -21,6 +21,7 @@ const LoginPage = () => {
   const [unauthorized, setUnauthorized] = useState<Unauthorized>();
   const [fadeOut, setFadeOut] = useState<boolean>(false);
   const [handle, setHandle] = useState<string>();
+  const [password, setPassword] = useState<string>();
   
   const schema = yup
     .object({
@@ -53,11 +54,13 @@ const LoginPage = () => {
   });
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
     if (rx) {
       if (rx.message.match(/^unauthorized\s/)) {
         const [_, chances, expires] = rx.message.split(' ').map(e => parseInt(e));
 
-        setTimeout(() => {
+        timeout = setTimeout(() => {
           reset();
           setUnauthorized({ chances, expires, handle });  
           setWaiting(false);
@@ -73,7 +76,24 @@ const LoginPage = () => {
           handle,
         });
       }
+    } 
+    else if(rx.message.match(/^throttle\s/)) {
+      const [_, until] = rx.message.split(' ');
+      const delay = 1 + parseInt(until) - Date.now();
+
+      timeout = setTimeout(() => {
+        setTx({
+          message: `login ${handle} ${password}`,
+          timestamp: Date.now(),
+        });
+      }, delay);
     }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
   }, [rx]);
 
   const onSubmit = (data) => {
@@ -90,6 +110,7 @@ const LoginPage = () => {
     }
 
     setHandle(watch('handle'));
+    setPassword(watch('password'));
     setWaiting(true);
     setTx({
       message: `login ${data.handle} ${data.password}`,

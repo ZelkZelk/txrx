@@ -30,10 +30,9 @@ services:
         WEBSOCKET_PORT: 8080
         CONSUMER_GROUP: 'websocket'
         CONSUMER: 'w0'
-        TX_DELAY: 100
         THROTTLE_WARNS: 5
         THROTTLE_MESSAGES: 10
-        THROTTLE_TIME_UNIT: 10000
+        THROTTLE_TIME_UNIT: 5000
     networks:
       - bus
 
