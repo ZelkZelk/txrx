@@ -54,15 +54,10 @@ export default () => {
             case AuthState.AUTHORIZING:
                 setAuthState(AuthState.AUTHORIZE);
                 return;
-            case AuthState.VALIDATE:
-                setAuthState(AuthState.AUTHORIZE);
-                return;
             case AuthState.VALIDATING:
                 setAuthState(AuthState.VALIDATE);
                 return;
         }
-
-        setAuthState(AuthState.NOTHING);
     };
 
     useEffect(() => {
