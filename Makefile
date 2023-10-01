@@ -69,6 +69,7 @@ all:
 	make redis
 	make redis-p2p
 	make services
+	make postgres
 
 rpc-all:
 	make rpc      

@@ -37,7 +37,9 @@ export default abstract class Worker {
             await this.consumer.createGroup(this.consuming);
         } catch (e) {
             if (/BUSYGROUP/.test(e)) {
-                console.info(e);
+                if (process.env.NODE_ENV! === 'development') {
+                    console.info(e);
+                }
             }
         }
 
@@ -48,7 +50,9 @@ export default abstract class Worker {
                 this.pel = false;
             }
 
-            for await(const item of items) {
+            await Promise.all(items.map(async (item) => {
+                this.consuming.id =  item.id;
+                
                 try {
                     const ack = await this.consume(item);
 
@@ -58,9 +62,7 @@ export default abstract class Worker {
                 } catch (e) {
                     console.error(e);
                 }
-                    
-                this.consuming.id =  item.id;
-            }
+            }));
 
             if (this.pel === false) {
                 this.consuming.id = '>';

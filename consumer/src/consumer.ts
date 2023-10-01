@@ -1,11 +1,12 @@
 import { Consumable, ConsumeItem, Consumption, Disposable, PendingItem } from './../types/consumer.types';
 import { Redis } from "ioredis";
+import { RedisConnector } from "redis";
 
 export default class Consumer {
     private redis: Redis;
 
     constructor(private url: string) {
-        this.redis = new Redis(this.url);
+        this.redis = RedisConnector.get().get(url);
     }
 
     public async createGroup(what: Consumable) {

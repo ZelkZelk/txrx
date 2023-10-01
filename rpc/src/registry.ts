@@ -23,12 +23,12 @@ export default class Registry {
         const handlersDirectory = path.join(__dirname, fixedDirectory);
         const files = await fsp.readdir(handlersDirectory);
 
-        for await (const file of files) {
+        await Promise.all(files.map(async (file) => {
             if (/\.(j|t)s$/.test(file)) {
                 const handlerModule = await import(path.join(__dirname, fixedDirectory, file));
                 this.handlers.push(new handlerModule.default());
             }
-        }
+        }));
     }
 
     public register(command: string, handler: (...data: string[]) => Promise<Computation>) {

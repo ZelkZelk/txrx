@@ -27,9 +27,9 @@ export default class Queue {
 
         this.rates[conn].timestamps = this.rates[conn].timestamps.filter(t => {
             return t >= boundary;
-        }).slice(0, limit);
+        }).slice(0, limit + 1);
 
-        if (this.rates[conn].timestamps.length >= limit) {
+        if (this.rates[conn].timestamps.length > limit) {
             return true;
         }
 

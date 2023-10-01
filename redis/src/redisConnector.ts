@@ -1,5 +1,5 @@
-import { RedisConnection } from '../../types/storage.types';
 import { Redis } from 'ioredis';
+import { RedisConnection } from '../types/redis.types';
 
 export default class RedisConnector {
     private static instance: RedisConnector;

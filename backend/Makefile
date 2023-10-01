@@ -13,10 +13,10 @@ sd-create:
 db-create:
 	npx sequelize-cli db:create
 
-migrate:
+db-migrate:
 	npx sequelize-cli db:migrate
 
-rollback:
+db-rollback:
 	npx sequelize-cli db:migrate:undo
 
 db-seed:
@@ -25,3 +25,7 @@ db-seed:
 db-seed-rollback:
 	npx sequelize-cli db:seed:undo:all
 
+bootstrap:
+	make db-create
+	make db-migrate
+	make db-seed

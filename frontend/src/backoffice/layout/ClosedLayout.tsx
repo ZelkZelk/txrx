@@ -13,7 +13,7 @@ export default () => {
         <div className="flex h-screen items-center justify-center bg-gray dark:border-strokedark dark:bg-boxdark ">
             <div className="flex flex-wrap items-center max-w-[410px]">
                 <div className="hidden w-full xl:block">
-                    <div className="max-w-xl text-center">
+                    <div className="max-w-xl text-center items-center flex-col flex">
                         <img className="hidden dark:block" src={LogoDark} alt="Logo" />
                         <img className="dark:hidden" src={Logo} alt="Logo" />
                         <div className="mt-7.5 text-center">

@@ -44,15 +44,15 @@ export default class RPC {
 
         const computation = await handler(...[payload.data, payload.conn, payload.tx]);
 
-        for await(const message of computation.messages) {
+        await Promise.all(computation.messages.map(async (message) => {
             message.payload = {
                 conn: payload.conn,
                 tx: payload.tx,
                 ...message.payload,
             };
 
-            await this.streamer.stream(message);
-        }
+            return this.streamer.stream(message);
+        }));
 
         return computation.ack;
     }

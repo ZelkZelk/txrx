@@ -1,3 +1,4 @@
+import { RedisConnector } from 'redis';
 import { Streamable } from './../types/streamer.types';
 import { Redis } from "ioredis";
 
@@ -5,7 +6,7 @@ export default class Streamer {
     private redis: Redis;
 
     constructor(private url: string) {
-        this.redis = new Redis(this.url);
+        this.redis = RedisConnector.get().get(url);
     }
 
     public async stream(what: Streamable) {
