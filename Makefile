@@ -71,13 +71,13 @@ all:
 	make services
 
 rpc-all:
-	make rpc      &
-	make rpc-auth &
+	make rpc      
+	make rpc-auth 
 
 services:
-	make dispatcher &
-	make rpc-all    &
-	make websocket  &
+	make dispatcher 
+	make rpc-all    
+	make websocket  
 
 logs:
 	docker-compose logs --tail=0 --follow

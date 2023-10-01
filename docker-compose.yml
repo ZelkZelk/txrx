@@ -31,7 +31,7 @@ services:
         CONSUMER_GROUP: 'websocket'
         CONSUMER: 'w0'
         THROTTLE_WARNS: 5
-        THROTTLE_MESSAGES: 10
+        THROTTLE_MESSAGES: 2
         THROTTLE_TIME_UNIT: 5000
     networks:
       - bus

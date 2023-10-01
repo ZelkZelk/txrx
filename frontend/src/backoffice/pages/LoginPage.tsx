@@ -74,19 +74,19 @@ const LoginPage = () => {
           roles: roles as Roles[],
           token,
           handle,
-        });
-      }
-    } 
-    else if(rx.message.match(/^throttle\s/)) {
-      const [_, until] = rx.message.split(' ');
-      const delay = 1 + parseInt(until) - Date.now();
+          });
+      } 
+      else if(rx.message.match(/^throttle\s/)) {
+        const [_, until] = rx.message.split(' ');
+        const delay = 1 + parseInt(until) - Date.now();
 
-      timeout = setTimeout(() => {
-        setTx({
-          message: `login ${handle} ${password}`,
-          timestamp: Date.now(),
-        });
-      }, delay);
+        timeout = setTimeout(() => {
+          setTx({
+            message: `login ${handle} ${password}`,
+            timestamp: Date.now(),
+          });
+        }, delay);
+      }
     }
 
     return () => {
@@ -137,12 +137,12 @@ const LoginPage = () => {
   let alertMessage;
 
   if (unauthorized?.expires) {
-    alertMessage = t('Inicio de sesión de bloqueado hasta {{expires}}', {
+    alertMessage = t('Signing in is blocked until {{expires}}', {
       expires: DateTime.fromMillis(unauthorized.expires).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)
     });
   }
   else if (unauthorized?.chances) {
-    alertMessage = t('Te quedan {{chances}} intentos', { ...unauthorized });
+    alertMessage = t('You have {{chances}} chances left', { ...unauthorized });
   }
 
   return (
@@ -166,7 +166,7 @@ const LoginPage = () => {
                   {t('Sign In')}
                 </h2>
 
-                {unauthorized ? <Alert fadeOut={fadeOut} type={AlertType.WARNING} message={alertMessage} title={t('Verifica tus credenciales')} /> : <></>}
+                {unauthorized ? <Alert fadeOut={fadeOut} type={AlertType.WARNING} message={alertMessage} title={t('Check your credentials')} /> : <></>}
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="mb-4">
