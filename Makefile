@@ -12,7 +12,10 @@ node_clean:
 	rm -rf streamer/dist streamer/node_modules
 	rm -rf p2p/dist p2p/node_modules
 	rm -rf backend/dist backend/node_modules
-	rm -rf frontend/dist backend/node_modules
+	rm -rf frontend/dist fronted/node_modules
+	rm -rf redis/dist redis/node_modules
+
+make node_install:
 	cd consumer && npm i && cd ..
 	cd dispatcher && npm i && cd ..
 	cd websocket && npm i && cd ..
@@ -21,6 +24,7 @@ node_clean:
 	cd p2p && npm i && cd ..
 	cd backend && npm i && cd ..
 	cd frontend && npm i && cd ..
+	cd redis && npm i && cd ..
 
 stop:
 	docker-compose stop
