@@ -68,7 +68,7 @@ sequenceDiagram
 
 ### RPC separation
 
-By subscribing to the `p2p` network the `dispatcher` will always know where to put the incoming message in order to get properly consumed. This lets you deploy many separate `rpc` that could `handle` specific domains of your system on the fly, no need to restart whe `dispatcher` nor the `websocket`.
+By subscribing to the `p2p` network the `dispatcher` will always know where to put the incoming message in order to get properly consumed. This lets you deploy many separate `rpc` that could `handle` specific domains of your system on the fly, no need to restart the `dispatcher` nor the `websocket`.
 
 ```mermaid
 flowchart TD
@@ -136,10 +136,10 @@ Generally speaking, as a baseline you will need:
 - one unit of `dispatcher`, although it can be horizontally scaled by adding more consumers to its `consuming group`
 - one unit of `rpc`, if you wish you can `monolith` your rpc up, however the architecture let you both `separate` into domain specific rpc and also horizontally scale by adding more consumers.
 
-**Note:** the `boileplate` run aways from a `monolithic` rpc from the get go by separating the `auth handlers`.
+**Note:** the `boilerplate` runs away from a `monolithic` rpc from the get go by separating the `auth handlers`.
 
 ## Getting started
 
-We recommend to check out the instuctions at the [ToxRox Ejector Project](https://github.com/ZelkZelk/txrx-ejector).
+We recommend to check out the instructions at the [ToxRox Ejector Project](https://github.com/ZelkZelk/txrx-ejector). 
 
-By following its instructions, you will get an `ejected` ToxRox project ready to build upon.
+By following the ejector `setup`, you will get an `ejected` **ToxRox** project ready to build upon.
