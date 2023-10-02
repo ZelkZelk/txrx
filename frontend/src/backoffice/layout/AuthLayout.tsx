@@ -36,14 +36,14 @@ export default () => {
                 timeout = setTimeout(() => {
                     setAuthState(AuthState.COMPLETED);
                 }, 500);
-                return;
+                break;
             case AuthState.COMPLETED:
                 return;
             case AuthState.LOGOUT:
                 timeout = setTimeout(() => {
                     setAuth(null);
                 }, 500);
-                return;
+                break;
         }
 
         return timeout;
