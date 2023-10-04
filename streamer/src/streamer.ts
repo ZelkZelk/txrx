@@ -6,7 +6,7 @@ export default class Streamer {
     private redis: Redis;
 
     constructor(private url: string) {
-        this.redis = RedisConnector.get().get(url);
+        this.redis = RedisConnector.get('streamer').get(url);
     }
 
     public async stream(what: Streamable) {

@@ -35,7 +35,7 @@ Additionaly, each `rpc` is responsible to let know the `dispatcher` what message
 
 ### P2P network
 
-When the `dispatcher` initializes, a `init` message is broadcasted, letting all the online peers know a new peer has become online needing all the `shards` from its peers to properly function. Each online `rpc` will dispatch the init message by broadcasting the `share` message including its own shard, carrying all the info about the messages it can consume.
+When the `dispatcher` initializes, a `init` message is broadcasted, letting all the online peers know a new peer has become online needing all the `shards` from its peers to properly function. Each online `rpc` will dispatch the init message by broadcasting the `share` message including its own `shard`, carrying all the info about the messages it can consume. A `shard` is simply an array of strings listing all the messages the rpc can dispatch itself.
 
 ```mermaid
 sequenceDiagram
@@ -61,6 +61,8 @@ sequenceDiagram
     Dispatcher-->>RedisP2P: XREAD P2P
     RedisP2P-->>Dispatcher: share
 ```
+
+Eventually the P2P network converges, the dispatcher has all the `shards` from the rpc peers, consequently therefore it can act as a dynamic message router.
 
 **Note:** if the `dispatcher` didn't know where to stream an incoming message it won't acknowledge it.
 
