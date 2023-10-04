@@ -22,6 +22,8 @@ services:
       args:
         - PACKAGE=websocket
         - DEPS=streamer consumer redis
+    depends_on:
+      - redis
     ports:
       - '8080:8080'
     restart: always
@@ -44,6 +46,9 @@ services:
       args:
         - PACKAGE=dispatcher
         - DEPS=consumer streamer p2p redis
+    depends_on:
+      - redis
+      - redis-p2p
     restart: always
     environment:
         <<: *common-variables
@@ -63,6 +68,9 @@ services:
       args:
         - PACKAGE=rpc
         - DEPS=consumer streamer p2p backend redis
+    depends_on:
+      - redis
+      - redis-p2p
     restart: always
     environment:
         <<: *common-variables
@@ -86,6 +94,10 @@ services:
       args:
         - PACKAGE=rpc
         - DEPS=consumer streamer p2p backend redis
+    depends_on:
+      - redis
+      - redis-p2p
+      - postgres
     restart: always
     environment:
         <<: *common-variables
