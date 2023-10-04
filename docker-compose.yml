@@ -1,5 +1,11 @@
 version: '3.4'
 
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
 x-common-variables: &common-variables
   REDIS_BUS: 'redis://txrx-redis:6379'
   REDIS_P2P: 'redis://txrx-redis-p2p:6379'
@@ -37,6 +43,7 @@ services:
         THROTTLE_TIME_UNIT: 5000
     networks:
       - bus
+    logging: *logging
 
   dispatcher:
     container_name: txrx-dispatcher
@@ -59,6 +66,7 @@ services:
       - bus
       - data
       - p2p
+    logging: *logging
 
   rpc:
     container_name: txrx-rpc
@@ -85,6 +93,7 @@ services:
       - bus
       - data
       - p2p
+    logging: *logging
 
   rpc-auth:
     container_name: txrx-rpc-auth
@@ -112,6 +121,7 @@ services:
       - bus
       - data
       - p2p
+    logging: *logging
 
   redis:
     container_name: txrx-redis
@@ -121,6 +131,7 @@ services:
       - 6379:6379
     networks:
       - bus
+    logging: *logging
 
   redis-p2p:
     container_name: txrx-redis-p2p
@@ -130,6 +141,7 @@ services:
       - 7379:6379
     networks:
       - p2p
+    logging: *logging
 
   postgres:
     container_name: txrx-postgres
@@ -145,19 +157,92 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - data
+    logging: *logging
   
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib
-    volumes:
-      - ./otel-collector-config.yml:/etc/otelcol-contrib/config.yaml
+  jaeger:
+    image: jaegertracing/all-in-one:1.49
+    container_name: txrx-jaeger
+    command:
+      - "--memory.max-traces"
+      - "8000"
+      - "--query.base-path"
+      - "/jaeger/ui"
+      - "--prometheus.server-url"
+      - "http://txrx-prometheus:9090"
+      - "--prometheus.query.support-spanmetrics-connector=true"
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    restart: unless-stopped
     ports:
-      - 1888:1888 # pprof extension
-      - 8888:8888 # Prometheus metrics exposed by the collector
-      - 8889:8889 # Prometheus exporter metrics
-      - 13133:13133 # health_check extension
-      - 4317:4317 # OTLP gRPC receiver
-      - 4318:4318 # OTLP http receiver
-      - 55679:55679 # zpages extension
+      - "16686" 
+      - "4317"                           
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - METRICS_STORAGE_TYPE=prometheus
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana:10.1.2
+    container_name: txrx-grafana
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    environment:
+      - "GF_INSTALL_PLUGINS=grafana-opensearch-datasource"
+    volumes:
+      - ./telemetry/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./telemetry/grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - "3001:3001"
+    logging: *logging
+
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.86.0
+    container_name: txrx-otelcol
+    deploy:
+      resources:
+        limits:
+          memory: 125M
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-config.yml", "--config=/etc/otelcol-observability.yml", "--config=/etc/otelcol-config-extras.yml" ]
+    volumes:
+      - ./telemetry/otelcol/otelcol-config.yml:/etc/otelcol-config.yml
+      - ./telemetry/otelcol/otelcol-observability.yml:/etc/otelcol-observability.yml
+      - ./telemetry/otelcol/otelcol-config-extras.yml:/etc/otelcol-config-extras.yml
+    ports:
+      - "4317"          # OTLP over gRPC receiver
+      - "4318:4318"     # OTLP over HTTP receiver
+      - "9464"          # Prometheus exporter
+      - "8888"          # metrics endpoint
+    depends_on:
+      - jaeger
+    logging: *logging
+
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.47.0
+    container_name: txrx-prometheus
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus-config.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+      - --enable-feature=exemplar-storage
+      - --enable-feature=otlp-write-receiver
+    volumes:
+      - ./telemetry/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    ports:
+      - "9090:9090"
+    logging: *logging
 
 networks:
   bus:

@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: 'txrx'
+    orgId: 1
+    folder: 'txrx'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/txrx

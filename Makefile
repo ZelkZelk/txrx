@@ -1,4 +1,4 @@
-.PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres
+.PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres telemetry
 
 clean:
 	docker compose down --rmi all -v --remove-orphans
@@ -86,3 +86,29 @@ services:
 
 logs:
 	docker compose logs --tail=0 --follow
+
+otelcol:
+	docker compose stop otelcol
+	docker compose rm --force otelcol
+	docker compose up -d otelcol --remove-orphans
+
+jaeger:
+	docker compose stop jaeger
+	docker compose rm --force jaeger
+	docker compose up -d jaeger --remove-orphans
+
+prometheus:
+	docker compose stop prometheus
+	docker compose rm --force prometheus
+	docker compose up -d prometheus --remove-orphans
+
+grafana:
+	docker compose stop grafana
+	docker compose rm --force grafana
+	docker compose up -d grafana --remove-orphans
+
+telemetry:
+	make jaeger
+	make otelcol
+	make prometheus
+	make grafana
