@@ -6,7 +6,7 @@ export default class Consumer {
     private redis: Redis;
 
     constructor(private url: string) {
-        this.redis = RedisConnector.get().get(url);
+        this.redis = RedisConnector.get('consumer').get(url);
     }
 
     public async createGroup(what: Consumable) {

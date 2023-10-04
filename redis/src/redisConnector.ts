@@ -1,18 +1,18 @@
 import { Redis } from 'ioredis';
-import { RedisConnection } from '../types/redis.types';
+import { RedisConnection} from '../types/redis.types';
 
 export default class RedisConnector {
-    private static instance: RedisConnector;
+    private static instances: { [key:string]: RedisConnector } = {};
     private pool: RedisConnection = {};
 
     private constructor() {};
 
-    public static get(): RedisConnector {
-        if (! RedisConnector.instance) {
-            RedisConnector.instance = new RedisConnector();
+    public static get(category: string): RedisConnector {
+        if (typeof RedisConnector.instances[category] === 'undefined') {
+            RedisConnector.instances[category] = new RedisConnector();
         }
 
-        return RedisConnector.instance;
+        return RedisConnector.instances[category];
     }
 
     public get(url: string): Redis {

@@ -1,7 +1,7 @@
 .PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres
 
 clean:
-	docker-compose down --rmi all -v --remove-orphans
+	docker compose down --rmi all -v --remove-orphans
 	docker system prune -f
 
 node_clean:
@@ -27,47 +27,47 @@ make node_install:
 	cd redis && npm i && cd ..
 
 stop:
-	docker-compose stop
+	docker compose stop
 
 start:
-	docker-compose start
+	docker compose start
 
 dispatcher:
 	docker stop txrx-dispatcher 			 || true
 	docker rm txrx-dispatcher 			 || true
 	docker image rm txrx-dispatcher:latest || true
-	docker-compose up -d --force-recreate --build dispatcher
+	docker compose up -d --force-recreate --build dispatcher
 
 rpc:
 	docker stop txrx-rpc 			  || true
 	docker rm txrx-rpc 			  || true
 	docker image rm txrx-rpc:latest || true
-	docker-compose up -d --force-recreate --build rpc
+	docker compose up -d --force-recreate --build rpc
 
 rpc-auth:
 	docker stop txrx-rpc-auth 			  || true
 	docker rm txrx-rpc-auth 			      || true
 	docker image rm txrx-rpc-auth:latest    || true
-	docker-compose up -d --force-recreate --build rpc-auth
+	docker compose up -d --force-recreate --build rpc-auth
 
 websocket:
 	docker stop txrx-websocket 		    || true
 	docker rm txrx-websocket 			    || true
 	docker image rm txrx-websocket:latest || true
-	docker-compose up -d --force-recreate --build websocket
+	docker compose up -d --force-recreate --build websocket
 
 redis:
-	docker-compose up -d redis
+	docker compose up -d redis
 
 redis-p2p:
-	docker-compose up -d redis-p2p
+	docker compose up -d redis-p2p
 
 redis-flush:
 	docker exec txrx-redis redis-cli flushall
 	docker exec txrx-redis-p2p redis-cli flushall
 
 postgres:
-	docker-compose up -d postgres
+	docker compose up -d postgres
 
 all:
 	make redis
@@ -85,4 +85,4 @@ services:
 	make websocket  
 
 logs:
-	docker-compose logs --tail=0 --follow
+	docker compose logs --tail=0 --follow
