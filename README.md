@@ -35,7 +35,7 @@ Additionaly, each `rpc` is responsible to let know the `dispatcher` what message
 
 ### P2P network
 
-When the `dispatcher` initializes, a `init` message is broadcasted, letting all the online peers know a new peer has become online needing all the `shards` from its peers to properly function. Each online `rpc` will dispatch the init message by broadcasting the `share` message including its own `shard`, carrying all the info about the messages it can consume. A `shard` is simply a array of strings listing the messages the rpc can dispatch itself.
+When the `dispatcher` initializes, a `init` message is broadcasted, letting all the online peers know a new peer has become online needing all the `shards` from its peers to properly function. Each online `rpc` will dispatch the init message by broadcasting the `share` message including its own `shard`, carrying all the info about the messages it can consume. A `shard` is simply an array of strings listing all the messages the rpc can dispatch itself.
 
 ```mermaid
 sequenceDiagram
