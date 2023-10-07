@@ -1,7 +1,7 @@
 version: '3.4'
 
 x-default-logging: &logging
-  driver: "json-file"
+  driver: "json-file" 
   options:
     max-size: "5m"
     max-file: "2"
@@ -27,12 +27,12 @@ services:
       context: ./
       args:
         - PACKAGE=websocket
-        - DEPS=streamer consumer redis
+        - DEPS=streamer consumer redis telemetry
     depends_on:
       - redis
     ports:
       - '8080:8080'
-    restart: always
+    restart: unless-stopped
     environment:
         <<: *common-variables
         WEBSOCKET_PORT: 8080
@@ -41,6 +41,8 @@ services:
         THROTTLE_WARNS: 5
         THROTTLE_MESSAGES: 10
         THROTTLE_TIME_UNIT: 5000
+        OTEL_SERVICE_NAME: txrx-websocket
+        OTEL_SERVICE_VERSION: 1.0
     networks:
       - bus
     logging: *logging
@@ -56,7 +58,7 @@ services:
     depends_on:
       - redis
       - redis-p2p
-    restart: always
+    restart: unless-stopped
     environment:
         <<: *common-variables
         CONSUMER_GROUP: 'dispatcher'
@@ -79,7 +81,7 @@ services:
     depends_on:
       - redis
       - redis-p2p
-    restart: always
+    restart: unless-stopped
     environment:
         <<: *common-variables
         CONSUMER_GROUP: 'rpc'
@@ -107,7 +109,7 @@ services:
       - redis
       - redis-p2p
       - postgres
-    restart: always
+    restart: unless-stopped
     environment:
         <<: *common-variables
         CONSUMER_GROUP: 'rpc'
@@ -126,7 +128,7 @@ services:
   redis:
     container_name: txrx-redis
     image: redis:latest
-    restart: always
+    restart: unless-stopped
     ports:
       - 6379:6379
     networks:
@@ -136,7 +138,7 @@ services:
   redis-p2p:
     container_name: txrx-redis-p2p
     image: redis:latest
-    restart: always
+    restart: unless-stopped
     ports:
       - 7379:6379
     networks:
@@ -146,7 +148,7 @@ services:
   postgres:
     container_name: txrx-postgres
     image: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
@@ -176,7 +178,7 @@ services:
           memory: 300M
     restart: unless-stopped
     ports:
-      - "16686" 
+      - "16686:16686" 
       - "4317"                           
     environment:
       - COLLECTOR_OTLP_ENABLED=true
@@ -190,6 +192,7 @@ services:
       resources:
         limits:
           memory: 100M
+    restart: unless-stopped
     environment:
       - "GF_INSTALL_PLUGINS=grafana-opensearch-datasource"
     volumes:
@@ -224,6 +227,7 @@ services:
   prometheus:
     image: quay.io/prometheus/prometheus:v2.47.0
     container_name: txrx-prometheus
+    restart: unless-stopped
     command:
       - --web.console.templates=/etc/prometheus/consoles
       - --web.console.libraries=/etc/prometheus/console_libraries

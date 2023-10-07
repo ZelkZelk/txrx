@@ -1,7 +1,7 @@
 .PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres telemetry
 
 clean:
-	docker compose down --rmi all -v --remove-orphans
+	docker compose down --rmi local -v --remove-orphans
 	docker system prune -f
 
 node_clean:

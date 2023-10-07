@@ -17,6 +17,7 @@
     "redis": "^4.6.7",
     "streamer": "file:../streamer",
     "consumer": "file:../consumer",
+    "telemetry": "file:../telemetry",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   }

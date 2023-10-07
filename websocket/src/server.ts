@@ -1,3 +1,4 @@
+import {} from 'telemetry';
 import { WebSocketServer } from 'ws';
 import Queue from './queue';
 import Transceiver from './transceiver';
