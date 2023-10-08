@@ -1,0 +1,17 @@
+{
+    "watch": [
+        "telemetry/src",
+        "websocket/src",
+        "dispatcher/src",
+        "rpc/src",
+        "consumer/src",
+        "streamer/src",
+        "backend/src",
+        "p2p/src",
+        "redis/src"
+    ],
+    "ext": "ts",
+    "verbose": true,
+    "delay": 3000,
+    "exec": "make reload"
+}

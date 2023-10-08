@@ -2,6 +2,7 @@ import { ConsumeItem } from 'consumer/types/consumer.types';
 import { ConnectionPool, Transmission, TransmissionPool, Heartbeats, Rates } from './../types/websocket.types';
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from 'uuid';
+import { Instrumentation } from 'telemetry';
 
 export default class Queue {
     private connectionPool: ConnectionPool = {};
@@ -64,6 +65,8 @@ export default class Queue {
     public heartbeat(): void {
         if (! this.heartbeatInterval) {
             this.heartbeatInterval = setInterval(() => {
+                const span = Instrumentation.producer('heartbeat');
+    
                 const now = Date.now();
 
                 for(const conn of Object.keys(this.heartbeats)) {
@@ -75,6 +78,7 @@ export default class Queue {
                     this.ping(conn, now);
                 }
 
+                Instrumentation.end(span);
             }, parseInt(process.env.TTL!) / 2);
         }
     }

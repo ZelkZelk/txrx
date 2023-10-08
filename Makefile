@@ -1,4 +1,6 @@
-.PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres telemetry
+.PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres telemetry tsc
+
+ENV := $(shell echo $$ENV)
 
 clean:
 	docker compose down --rmi local -v --remove-orphans
@@ -14,8 +16,9 @@ node_clean:
 	rm -rf backend/dist backend/node_modules
 	rm -rf frontend/dist fronted/node_modules
 	rm -rf redis/dist redis/node_modules
+	rm -rf telemetry/dist telemetry/node_modules
 
-make node_install:
+node_install:
 	cd consumer && npm i && cd ..
 	cd dispatcher && npm i && cd ..
 	cd websocket && npm i && cd ..
@@ -25,12 +28,49 @@ make node_install:
 	cd backend && npm i && cd ..
 	cd frontend && npm i && cd ..
 	cd redis && npm i && cd ..
+	cd telemetry && npm i && cd ..
+
+tsc_kill:
+	ps aux | grep -w tsc | grep -v 'grep' |grep -v 'make' | awk '{print $$2}' | xargs -r kill
+
+autoload:
+	make tsc_kill
+	cd telemetry && npx tsc -w &
+	cd redis && npx tsc -w &
+	cd consumer && npx tsc -w &
+	cd streamer && npx tsc -w &
+	cd p2p && npx tsc -w &
+	cd dispatcher && npx tsc -w &
+	cd websocket && npx tsc -w &
+	cd rpc && npx tsc -w &
+	cd backend && npx tsc -w &
+	npm i -g nodemon
+	nodemon || true
+	[[ -z "$(jobs -p)" ]] || kill $(jobs -p)
+
+reload:
+	make websocket &
+
+tsc:
+	make tsc_kill
+	cd telemetry && npx tsc &
+	cd redis && npx tsc &
+	cd consumer && npx tsc &
+	cd streamer && npx tsc &
+	cd p2p && npx tsc &
+	cd dispatcher && npx tsc &
+	cd websocket && npx tsc &
+	cd rpc && npx tsc &
+	cd backend && npx tsc &
 
 stop:
 	docker compose stop
 
 start:
 	docker compose start
+
+restart:
+	docker compose restart
 
 dispatcher:
 	docker stop txrx-dispatcher 			 || true
@@ -50,11 +90,31 @@ rpc-auth:
 	docker image rm txrx-rpc-auth:latest    || true
 	docker compose up -d --force-recreate --build rpc-auth
 
+compile:
+	@if [ ! -z ${filename} ]; then echo "this was ${filename}"; else tail -f; fi
+
 websocket:
-	docker stop txrx-websocket 		    || true
-	docker rm txrx-websocket 			    || true
-	docker image rm txrx-websocket:latest || true
+ifeq ($(ENV),production)
+	@make websocket_prod
+else
+	@make websocket_dev
+endif
+
+websocket_prod:
+	make websocket_down
 	docker compose up -d --force-recreate --build websocket
+
+websocket_dev:
+	@if docker compose ps websocket | grep -qw "txrx-websocket"; then \
+        docker compose restart websocket; \
+    else \
+        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d websocket; \
+    fi
+
+websocket_down:
+	docker compose stop websocket
+	docker compose rm websocket
+	docker rmi txrx-websocket
 
 redis:
 	docker compose up -d redis
@@ -112,3 +172,14 @@ telemetry:
 	make otelcol
 	make prometheus
 	make grafana
+
+notel:
+	docker compose stop prometheus
+	docker compose rm --force prometheus
+	docker compose stop jaeger
+	docker compose rm --force jaeger
+	docker compose stop otelcol
+	docker compose rm --force otelcol
+	docker compose stop grafana
+	docker compose rm --force grafana
+

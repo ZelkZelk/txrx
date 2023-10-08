@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  websocket:
+    volumes:
+      - ./:/usr/app
+
+  dispatcher:
+    volumes:
+      - ./:/usr/app
+
+  rpc:
+    volumes:
+      - ./:/usr/app
+
+  rpc-auth:
+    volumes:
+      - ./:/usr/app
