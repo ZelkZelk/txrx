@@ -16,6 +16,7 @@
     "consumer": "file:../consumer",
     "p2p": "file:../p2p",
     "rxjs": "^7.8.1",
-    "streamer": "file:../streamer"
+    "streamer": "file:../streamer",
+    "telemetry": "file:../telemetry"
   }
 }

@@ -1,4 +1,4 @@
-import { Instrumentation, Spanner } from 'telemetry';
+import { Instrumentation } from 'telemetry';
 import { WebSocketServer } from 'ws';
 import Queue from './queue';
 import Transceiver from './transceiver';
@@ -21,20 +21,22 @@ setImmediate(() => {
 
 setImmediate(() => {
   wss.on('connection', function connection(ws) {
-    const connSpan = Instrumentation.producer('connection', mainSpan);
+    const connSpan = Instrumentation.producer('ws:connection', false);
     const conn = queue.add(ws);
+    connSpan.attr('ws', mainSpan.get().spanContext().spanId);
     connSpan.attr('conn', conn);
 
     console.info(conn, '+');
 
     ws.on('error', (err) => {
-      const errorSpan = Instrumentation.consumer('error', connSpan);
+      const errorSpan = Instrumentation.consumer('ws:error', connSpan);
+      errorSpan.attr('err', err.message);
       console.error(err);
       Instrumentation.end(errorSpan);
     });
 
     ws.on('close', () => {
-      const closeSpan = Instrumentation.consumer('close', connSpan);
+      const closeSpan = Instrumentation.consumer('ws:close', connSpan);
       ws.send('bye');
       queue.remove(conn);
       console.info(conn, '-');
@@ -42,7 +44,7 @@ setImmediate(() => {
     });
 
     ws.on('message', function message(msg) {
-      const messageSpan = Instrumentation.consumer('message', connSpan);
+      const messageSpan = Instrumentation.consumer('ws:message', connSpan);
       let data;
 
       if (msg instanceof Buffer) {
@@ -57,17 +59,20 @@ setImmediate(() => {
           let span;
 
           if (data.match(/^pong\s\d+/)) {
-            span = Instrumentation.producer('pong', messageSpan);
+            span = Instrumentation.producer('ws:pong', messageSpan);
             queue.pong(conn, data);
           }
           else if (queue.throttle(conn)) {
-            span = Instrumentation.producer('throttle', messageSpan);
-            queue.throttling(conn);
+            span = Instrumentation.producer('ws:throttle', messageSpan);
+            const countdown = queue.throttling(conn);
+            span.attr('cd', countdown);
           }
           else {
             const [command] = data.split(/\s/);
-            span = Instrumentation.producer(command, messageSpan);
-            const tx = queue.prepareTx(conn, data);
+            span = Instrumentation.producer(`ws:msg:${command}`, messageSpan);
+
+            const propagation = Instrumentation.propagate(span);
+            const tx = queue.prepareTx(conn, data, propagation);
             console.info(conn, 'tx', tx.tx, data);
   
             const id = await transceiver.transmit(tx);

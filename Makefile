@@ -50,6 +50,7 @@ autoload:
 
 reload:
 	make websocket &
+	make dispatcher &
 
 tsc:
 	make tsc_kill
@@ -73,10 +74,27 @@ restart:
 	docker compose restart
 
 dispatcher:
-	docker stop txrx-dispatcher 			 || true
-	docker rm txrx-dispatcher 			 || true
-	docker image rm txrx-dispatcher:latest || true
+ifeq ($(ENV),production)
+	@make dispatcher_prod
+else
+	@make dispatcher_dev
+endif
+
+dispatcher_prod:
+	make dispatcher_down
 	docker compose up -d --force-recreate --build dispatcher
+
+dispatcher_dev:
+	@if docker compose ps dispatcher | grep -qw "txrx-dispatcher"; then \
+        docker compose restart dispatcher; \
+    else \
+        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d dispatcher; \
+    fi
+
+dispatcher_down:
+	docker compose stop dispatcher
+	docker compose rm dispatcher
+	docker rmi txrx-dispatcher	
 
 rpc:
 	docker stop txrx-rpc 			  || true
@@ -89,9 +107,6 @@ rpc-auth:
 	docker rm txrx-rpc-auth 			      || true
 	docker image rm txrx-rpc-auth:latest    || true
 	docker compose up -d --force-recreate --build rpc-auth
-
-compile:
-	@if [ ! -z ${filename} ]; then echo "this was ${filename}"; else tail -f; fi
 
 websocket:
 ifeq ($(ENV),production)

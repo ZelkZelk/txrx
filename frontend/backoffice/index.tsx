@@ -34,16 +34,11 @@ const NotFoundLayout = lazy(() => import('../src/backoffice/layout/NotFoundLayou
 
 const EntryPoint = () => {
   const [auth, setAuth] = useLocalStorage<Authorized>('auth', null);
-  const [_user, setUser] = useState<Authorized>(null);
-
-  useEffect(() => {
-    setUser(auth);
-  }, [auth]);
 
   const router = createBrowserRouter([
     {
       path: u('/'),
-      element: <Backoffice url={process.env.REACT_APP_WEBSOCKET_URL!} auth={auth} setAuth={setAuth}/>,
+      element: <Backoffice url={process.env.REACT_APP_WEBSOCKET_URL!} setAuth={setAuth}/>,
       errorElement: <ErrorLayout />,
       children: [{
           path: 'login',

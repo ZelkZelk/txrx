@@ -22,7 +22,6 @@ export enum Roles {
 
 export type IBackOfficeProps = {
     url: string;
-    auth: Authorized;
     setAuth: Dispatch<SetStateAction<Authorized>>;
 };
 
@@ -37,7 +36,6 @@ export type IFormValidationProps = {
 export type IOutletContext = {
     rx?: Reception,
     setTx: Dispatch<SetStateAction<Transmission>>;
-    auth: Authorized;
     setAuth: Dispatch<SetStateAction<Authorized>>;
 };
 

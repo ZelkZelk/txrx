@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import Header from './../components/Header';
 import Sidebar from './../components/Sidebar';
 import { Outlet, useOutletContext } from 'react-router-dom';
-import { AuthState, IOutletContext, Roles, User } from '../../../types/backoffice.types';
+import { AuthState, Authorized, IOutletContext, Roles, User } from '../../../types/backoffice.types';
 import Loading from '../components/Loading';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 export default () => {
-    const { rx, setTx, auth, setAuth } = useOutletContext<IOutletContext>();
+    const [auth, setAuth] = useLocalStorage<Authorized>('auth', null);
+    const { rx, setTx, setAuth: logout } = useOutletContext<IOutletContext>();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [authState, setAuthState] = useState<AuthState>(AuthState.NOTHING);
 
@@ -35,14 +37,15 @@ export default () => {
             case AuthState.AUTHORIZED:
                 timeout = setTimeout(() => {
                     setAuthState(AuthState.COMPLETED);
-                }, 500);
+                }, 1);
                 break;
             case AuthState.COMPLETED:
                 return;
             case AuthState.LOGOUT:
                 timeout = setTimeout(() => {
                     setAuth(null);
-                }, 500);
+                    logout(null);
+                }, 1);
                 break;
         }
 

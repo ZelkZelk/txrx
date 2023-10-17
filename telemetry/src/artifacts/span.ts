@@ -1,4 +1,5 @@
-import { SpanArtifact, SpanBag, Spanner } from './../../types/telemetry.types';
+import { propagation } from '@opentelemetry/api';
+import { Propagation, SpanArtifact, SpanBag, Spanner } from './../../types/telemetry.types';
 import { Spannable } from "../../types/telemetry.types";
 
 export default class Span {
@@ -20,6 +21,10 @@ export default class Span {
 
     public kind(): Spanner {
         return this.spannable.kind;
+    }
+
+    public propagation(): Propagation {
+        return this.spannable.propagation;
     }
 
     public parent(): Span {

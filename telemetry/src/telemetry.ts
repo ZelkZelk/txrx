@@ -1,4 +1,4 @@
-import { Spannable } from "../types/telemetry.types";
+import { Propagation, Spannable } from "../types/telemetry.types";
 import Span from "./artifacts/span";
 
 export default abstract class Telemetry {
@@ -13,4 +13,5 @@ export default abstract class Telemetry {
   public abstract start(): void;
   public abstract span(spannable: Spannable): Span;
   public abstract closeSpan(span: Span);
+  public abstract propagate(span: Span): Propagation;
 }

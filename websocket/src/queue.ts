@@ -3,6 +3,7 @@ import { ConnectionPool, Transmission, TransmissionPool, Heartbeats, Rates } fro
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from 'uuid';
 import { Instrumentation } from 'telemetry';
+import { Propagation } from 'telemetry/types/telemetry.types';
 
 export default class Queue {
     private connectionPool: ConnectionPool = {};
@@ -43,12 +44,14 @@ export default class Queue {
         return false;
     }
 
-    public throttling(conn: string): void {
+    public throttling(conn: string): number {
+        let countdown;
+
         const ws = this.connectionPool[conn];
         if (ws) {
             const warns = parseInt(process.env.THROTTLE_WARNS!);
 
-            let countdown = warns - this.rates[conn].counter;
+            countdown = warns - this.rates[conn].counter;
             this.rates[conn].counter++;
 
             if (countdown <= 0) {
@@ -60,6 +63,8 @@ export default class Queue {
             const ends = Date.now() + unit;
             ws.send(`throttle ${ends} ${countdown}`);
         }
+
+        return countdown;
     }
 
     public heartbeat(): void {
@@ -133,7 +138,7 @@ export default class Queue {
     }
 
 
-    public prepareTx (conn: string, data: string): Transmission {
+    public prepareTx (conn: string, data: string, propagation: Propagation): Transmission {
         if (typeof this.txPool[conn] === 'undefined') {
             this.txPool[conn] = {};
         }
@@ -143,7 +148,8 @@ export default class Queue {
             conn,
             data,
             tx,
-        };
+            ...propagation,
+        } as Transmission;
 
         this.txPool[conn][tx] = transmission;
 

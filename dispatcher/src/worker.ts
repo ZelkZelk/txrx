@@ -1,9 +1,11 @@
+import { Propagation } from 'telemetry/types/telemetry.types';
 import { Consumable, ConsumeItem } from 'consumer/types/consumer.types';
 import Dispatcher from './dispatcher';
 import { P2PMapping } from "p2p/types/p2p.types";
 import { subscribe as P2Psubscribe, P2PListener } from 'p2p';
 import { Worker as ConsumerWorker } from 'consumer';
 import { Subscription } from 'rxjs';
+import { Instrumentation } from 'telemetry';
 
 @P2PListener()
 export default class Worker extends ConsumerWorker {
@@ -43,6 +45,19 @@ export default class Worker extends ConsumerWorker {
     }
 
     public async consume(item: ConsumeItem): Promise<boolean> {
-        return this.dispatcher.handler(item.payload);
+        const propagation: Propagation = {};
+
+        if (Object.hasOwn(item.payload, 'traceparent')) {
+            propagation.traceparent = item.payload.traceparent;
+        }
+
+        if (Object.hasOwn(item.payload, 'tracestate')) {
+            propagation.tracestate = item.payload.tracestate;
+        }
+
+        const span = Instrumentation.producer('disp:consume', propagation);
+        const res = await this.dispatcher.handler(item.payload, span);
+        Instrumentation.end(span);
+        return res;
     }
 }

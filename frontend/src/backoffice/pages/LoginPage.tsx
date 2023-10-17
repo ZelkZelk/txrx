@@ -15,7 +15,7 @@ import Alert from '../components/Alert';
 import { DateTime } from "luxon";
 
 const LoginPage = () => {
-  const { setTx, rx, setAuth } = useOutletContext<IOutletContext>();
+  const { setTx, rx, setAuth: login } = useOutletContext<IOutletContext>();
   const { t } = useTranslation();
   const [waiting, setWaiting] = useState<boolean>(false);
   const [unauthorized, setUnauthorized] = useState<Unauthorized>();
@@ -69,12 +69,12 @@ const LoginPage = () => {
       else if (rx.message.match(/^authorized\s/)) {
         const [_, expires, token, ...roles] = rx.message.split(' ');
 
-        setAuth({
+        login({
           expires: parseInt(expires),
           roles: roles as Roles[],
           token,
           handle,
-          });
+        });
       } 
       else if(rx.message.match(/^throttle\s/)) {
         const [_, until] = rx.message.split(' ');

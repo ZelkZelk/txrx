@@ -19,7 +19,7 @@ x-common-variables: &common-variables
   P2P_MAXLEN: 10000
   NODE_ENV: ${ENV:-development}
   OTLP_ENDPOINT: http://txrx-otelcol:4318
-  TELEMETRY: ${TELEMETRY:-console}
+  TELEMETRY: ${TELEMETRY:-exported}
 
 services:
   websocket:
@@ -46,6 +46,7 @@ services:
         THROTTLE_TIME_UNIT: 5000
     networks:
       - bus
+      - telemetry
     logging: *logging
 
   dispatcher:
@@ -56,7 +57,7 @@ services:
       args:
         - PACKAGE=dispatcher
         - VERSION=1.0
-        - DEPS=consumer streamer p2p redis
+        - DEPS=consumer streamer p2p redis telemetry
     depends_on:
       - redis
       - redis-p2p
@@ -70,6 +71,7 @@ services:
       - bus
       - data
       - p2p
+      - telemetry
     logging: *logging
 
   rpc:
@@ -188,6 +190,8 @@ services:
       - COLLECTOR_OTLP_ENABLED=true
       - METRICS_STORAGE_TYPE=prometheus
     logging: *logging
+    networks:
+      - telemetry
 
   grafana:
     image: grafana/grafana:10.1.2
@@ -205,6 +209,8 @@ services:
     ports:
       - "3001:3001"
     logging: *logging
+    networks:
+      - telemetry
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:0.86.0
@@ -227,6 +233,8 @@ services:
     depends_on:
       - jaeger
     logging: *logging
+    networks:
+      - telemetry
 
   prometheus:
     image: quay.io/prometheus/prometheus:v2.47.0
@@ -251,6 +259,8 @@ services:
     ports:
       - "9090:9090"
     logging: *logging
+    networks:
+      - telemetry
 
 networks:
   bus:
@@ -259,6 +269,8 @@ networks:
     name: txrx-data
   p2p:
     name: txrx-p2p
+  telemetry:
+    name: txrx-telemetry
 
 volumes:
   postgres:

@@ -13,6 +13,7 @@ export type Spannable = {
     name: string;
     kind: Spanner;
     parent?: Span;
+    propagation?: Propagation,
 };
 
 export enum Spanner {
@@ -32,4 +33,9 @@ export type Trace = Span[];
 
 export type SpanBag = {
     [key:string]: string;
+};
+
+export type Propagation = {
+    traceparent?: string;
+    tracestate?: string;
 };

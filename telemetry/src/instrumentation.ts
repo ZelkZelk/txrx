@@ -1,6 +1,5 @@
-import { SpanAttributes, Spannable, Spanner, StackTrace } from './../types/telemetry.types';
+import { Propagation, SpanAttributes, Spannable, Spanner } from './../types/telemetry.types';
 import Span from "./artifacts/span";
-import { Initiator, Facade } from "./decorators/telemetry.decorator";
 import Factory from "./factory";
 import Telemetry from "./telemetry";
 import * as process from 'process';
@@ -10,21 +9,25 @@ export default class Instrumentation {
   private static instance: Telemetry;
   private static active: Span;
 
-  @Initiator()
   public static start() {
     const instance = Factory.get();
     instance.start();
     Instrumentation.instance = instance;
   }
 
-  @Initiator()
+  public static activate(span: Span) {
+    Instrumentation.active = span;
+  }
+
   public static service() {
     Instrumentation.start();
 
-    const span = Instrumentation.trace({
-      name: process.env.PACKAGE!,
+    const spannable: Spannable = {
+      name: `srv:${process.env.PACKAGE!}`,
       kind: Spanner.SERVER,
-    });
+    };
+
+    const span = Instrumentation.trace(spannable);
 
     span.attr(SpanAttributes.HOST, os.hostname());
     span.attr(SpanAttributes.PID, '' +  process.pid);
@@ -34,31 +37,52 @@ export default class Instrumentation {
     return span;
   }
 
-  @Facade()
-  public static trace(spannable: Spannable): Span{
+  public static trace(spannable: Spannable): Span {
     return Instrumentation.instance.span(spannable);
   }
 
-  @Facade()
   public static end(span: Span) {
     Instrumentation.instance.closeSpan(span);
   }
 
-  @Facade()
-  public static producer(name: string, parent?: Span): Span {
+  public static producer(name: string, maybeParent?: Span | false | Propagation): Span {
     return Instrumentation.trace({
       kind: Spanner.PRODUCER,
-      parent: parent ?? Instrumentation.active,
       name,
+      ...Instrumentation.maybeSpannable(maybeParent),
     });
   }
 
-  @Facade()
-  public static consumer(name: string, parent?: Span): Span {
+  private static maybeSpannable(maybeParent?: Span | false | Propagation): Partial<Spannable> {
+    let parent: Span;
+    let propagation: Propagation;
+
+    if (maybeParent !== false) {
+      if (maybeParent instanceof Span) {
+        parent = maybeParent;
+      }
+      else if (typeof maybeParent !== 'undefined') {
+        propagation = maybeParent as Propagation;
+      } else {
+        parent = Instrumentation.active;
+      }
+    }
+
+    return {
+      parent,
+      propagation,
+    };
+  }
+
+  public static consumer(name: string, maybeParent?: Span | false | Propagation): Span {
     return Instrumentation.trace({
       kind: Spanner.CONSUMER,
-      parent: parent ?? Instrumentation.active,
       name,
+      ...Instrumentation.maybeSpannable(maybeParent),
     });
+  }
+
+  public static propagate(span: Span): Propagation {
+    return Instrumentation.instance.propagate(span);
   }
 }
