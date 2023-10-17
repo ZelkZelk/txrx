@@ -20,13 +20,21 @@ setImmediate(() => {
 });
 
 setImmediate(() => {
-  wss.on('connection', function connection(ws) {
+  wss.on('connection', function connection(ws, req) {
     const connSpan = Instrumentation.producer('ws:connection', false);
     const conn = queue.add(ws);
     connSpan.attr('ws', mainSpan.get().spanContext().spanId);
     connSpan.attr('conn', conn);
 
-    console.info(conn, '+');
+    for(const header of Object.keys(req.headers)) {
+      const maybeHeaders = req.headers[header];
+
+      if (typeof maybeHeaders === 'string') {
+        connSpan.attr(`header:${header}`, maybeHeaders);
+      } else {
+        connSpan.attr(`header:${header}`, maybeHeaders.join(' '));
+      }
+    }
 
     ws.on('error', (err) => {
       const errorSpan = Instrumentation.consumer('ws:error', connSpan);
@@ -39,7 +47,6 @@ setImmediate(() => {
       const closeSpan = Instrumentation.consumer('ws:close', connSpan);
       ws.send('bye');
       queue.remove(conn);
-      console.info(conn, '-');
       Instrumentation.end(closeSpan);
     });
 
@@ -73,7 +80,7 @@ setImmediate(() => {
 
             const propagation = Instrumentation.propagate(span);
             const tx = queue.prepareTx(conn, data, propagation);
-            console.info(conn, 'tx', tx.tx, data);
+            span.attr('tx', tx.tx);
   
             const id = await transceiver.transmit(tx);
             queue.settleTx(conn, tx.tx, id);

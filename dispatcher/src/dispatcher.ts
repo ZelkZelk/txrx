@@ -36,6 +36,13 @@ export default class Dispatcher {
         const stream = await P2Presolve(command);
 
         if (stream) {
+            const propagation = Instrumentation.propagate(span);
+
+            payload = {
+                ...payload,
+                ...propagation
+            };
+
             await this.streamer.stream({
                 id: '*',
                 stream,

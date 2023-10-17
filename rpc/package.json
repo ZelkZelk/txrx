@@ -14,7 +14,8 @@
     "streamer": "file:../streamer",
     "consumer": "file:../consumer",
     "backend": "file:../backend",
-    "p2p": "file:../p2p"
+    "p2p": "file:../p2p",
+    "telemetry": "file:../telemetry"
   },
   "devDependencies": {
     "@types/node": "^20.2.5"

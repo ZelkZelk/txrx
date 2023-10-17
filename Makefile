@@ -51,6 +51,8 @@ autoload:
 reload:
 	make websocket &
 	make dispatcher &
+	make rpc &
+	make rpc-auth &
 
 tsc:
 	make tsc_kill
@@ -97,16 +99,50 @@ dispatcher_down:
 	docker rmi txrx-dispatcher	
 
 rpc:
-	docker stop txrx-rpc 			  || true
-	docker rm txrx-rpc 			  || true
-	docker image rm txrx-rpc:latest || true
+ifeq ($(ENV),production)
+	@make rpc_prod
+else
+	@make rpc_dev
+endif
+
+rpc_prod:
+	make rpc_down
 	docker compose up -d --force-recreate --build rpc
 
+rpc_dev:
+	@if docker compose ps rpc | grep -qw "txrx-rpc"; then \
+        docker compose restart rpc; \
+    else \
+        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d rpc; \
+    fi
+
+rpc_down:
+	docker compose stop rpc
+	docker compose rm rpc
+	docker rmi txrx-rpc	
+
 rpc-auth:
-	docker stop txrx-rpc-auth 			  || true
-	docker rm txrx-rpc-auth 			      || true
-	docker image rm txrx-rpc-auth:latest    || true
+ifeq ($(ENV),production)
+	@make rpc-auth_prod
+else
+	@make rpc-auth_dev
+endif
+
+rpc-auth_prod:
+	make rpc-auth_down
 	docker compose up -d --force-recreate --build rpc-auth
+
+rpc-auth_dev:
+	@if docker compose ps rpc-auth | grep -qw "txrx-rpc-auth"; then \
+        docker compose restart rpc-auth; \
+    else \
+        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d rpc-auth; \
+    fi
+
+rpc-auth_down:
+	docker compose stop rpc-auth
+	docker compose rm rpc-auth
+	docker rmi txrx-rpc-auth	
 
 websocket:
 ifeq ($(ENV),production)

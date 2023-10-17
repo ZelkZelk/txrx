@@ -82,7 +82,7 @@ services:
       args:
         - PACKAGE=rpc
         - VERSION=1.0
-        - DEPS=consumer streamer p2p backend redis
+        - DEPS=consumer streamer p2p backend redis telemetry
     depends_on:
       - redis
       - redis-p2p
@@ -100,6 +100,7 @@ services:
       - bus
       - data
       - p2p
+      - telemetry
     logging: *logging
 
   rpc-auth:
@@ -110,7 +111,7 @@ services:
       args:
         - PACKAGE=rpc
         - VERSION=1.0
-        - DEPS=consumer streamer p2p backend redis
+        - DEPS=consumer streamer p2p backend redis telemetry
     depends_on:
       - redis
       - redis-p2p
@@ -118,7 +119,7 @@ services:
     restart: unless-stopped
     environment:
         <<: *common-variables
-        CONSUMER_GROUP: 'rpc'
+        CONSUMER_GROUP: 'rpc-auth'
         CONSUMER: 'r0'
         P2P_PEER: 'rpc-auth'
         RPC: 'auth'
@@ -129,6 +130,7 @@ services:
       - bus
       - data
       - p2p
+      - telemetry
     logging: *logging
 
   redis:
