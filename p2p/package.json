@@ -8,6 +8,7 @@
   "dependencies": {
     "consumer": "file:../consumer",
     "streamer": "file:../streamer",
+    "telemetry": "file:../telemetry",
     "rxjs": "^7.8.1",
     "typescript": "^5.1.3"
   },

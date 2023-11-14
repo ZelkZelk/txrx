@@ -2,6 +2,7 @@ import Registry from "../registry";
 import P2P from "../p2p";
 import { ConsumeItem } from "consumer/types/consumer.types";
 import Shard from "../shard";
+import Span from "telemetry/src/artifacts/span";
 
 let exec: NodeJS.Immediate;
 let stream: string;
@@ -46,7 +47,7 @@ function P2PShare(_: (...args: any[]) => Promise<any>, context: ClassMethodDecor
     }
 }
 
-function P2PHandler(target: (...args: ConsumeItem[]) => Promise<void> , context: ClassMethodDecoratorContext) {
+function P2PHandler(target: (item: ConsumeItem, parent: Span) => Promise<void> , context: ClassMethodDecoratorContext) {
     context.addInitializer(async function () {
         (await Registry.get()).add(context.name as string, target.bind(this));
     });

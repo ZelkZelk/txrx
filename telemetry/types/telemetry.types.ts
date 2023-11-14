@@ -32,7 +32,7 @@ export type StackTrace = Trace[];
 export type Trace = Span[];
 
 export type SpanBag = {
-    [key:string]: string;
+    [key:string]: string | string[];
 };
 
 export type Propagation = {

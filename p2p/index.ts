@@ -15,17 +15,10 @@ const resolve = async(event: string): Promise<string | null> => {
     return p2p.resolve(event);
 };
 
-const hello = async(): Promise<string> => {
-    const p2p = await P2P.get();
-
-    return p2p.hello();
-};
-
 export {
     P2PListener,
     P2PShare,
     P2PBroadcaster,
     subscribe,
     resolve,
-    hello,
 };

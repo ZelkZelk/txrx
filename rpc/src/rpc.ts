@@ -1,7 +1,6 @@
 import { Payload } from 'consumer/types/consumer.types';
 import { Streamer } from "streamer";
 import Registry from "./registry";
-import { setTimeout } from 'timers/promises'
 import Span from 'telemetry/src/artifacts/span';
 import { Instrumentation } from 'telemetry';
 

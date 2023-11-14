@@ -39,7 +39,7 @@ export default class Span {
         this.spannable.name = name;
     }
 
-    public attr(key: string, value: string) {
+    public attr(key: string, value: string | string[]) {
         this.bag[key] = value;
     }
 
