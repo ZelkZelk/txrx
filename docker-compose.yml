@@ -195,25 +195,6 @@ services:
     networks:
       - telemetry
 
-  grafana:
-    image: grafana/grafana:10.1.2
-    container_name: txrx-grafana
-    deploy:
-      resources:
-        limits:
-          memory: 100M
-    restart: unless-stopped
-    environment:
-      - "GF_INSTALL_PLUGINS=grafana-opensearch-datasource"
-    volumes:
-      - ./telemetry/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./telemetry/grafana/provisioning/:/etc/grafana/provisioning/
-    ports:
-      - "3001:3001"
-    logging: *logging
-    networks:
-      - telemetry
-
   otelcol:
     image: otel/opentelemetry-collector-contrib:0.86.0
     container_name: txrx-otelcol
@@ -234,32 +215,6 @@ services:
       - "8888"          # metrics endpoint
     depends_on:
       - jaeger
-    logging: *logging
-    networks:
-      - telemetry
-
-  prometheus:
-    image: quay.io/prometheus/prometheus:v2.47.0
-    container_name: txrx-prometheus
-    restart: unless-stopped
-    command:
-      - --web.console.templates=/etc/prometheus/consoles
-      - --web.console.libraries=/etc/prometheus/console_libraries
-      - --storage.tsdb.retention.time=1h
-      - --config.file=/etc/prometheus/prometheus-config.yaml
-      - --storage.tsdb.path=/prometheus
-      - --web.enable-lifecycle
-      - --web.route-prefix=/
-      - --enable-feature=exemplar-storage
-      - --enable-feature=otlp-write-receiver
-    volumes:
-      - ./telemetry/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
-    deploy:
-      resources:
-        limits:
-          memory: 300M
-    ports:
-      - "9090:9090"
     logging: *logging
     networks:
       - telemetry

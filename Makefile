@@ -208,29 +208,13 @@ jaeger:
 	docker compose rm --force jaeger
 	docker compose up -d jaeger --remove-orphans
 
-prometheus:
-	docker compose stop prometheus
-	docker compose rm --force prometheus
-	docker compose up -d prometheus --remove-orphans
-
-grafana:
-	docker compose stop grafana
-	docker compose rm --force grafana
-	docker compose up -d grafana --remove-orphans
-
 telemetry:
 	make jaeger
 	make otelcol
-	make prometheus
-	make grafana
 
 notel:
-	docker compose stop prometheus
-	docker compose rm --force prometheus
 	docker compose stop jaeger
 	docker compose rm --force jaeger
 	docker compose stop otelcol
 	docker compose rm --force otelcol
-	docker compose stop grafana
-	docker compose rm --force grafana
 

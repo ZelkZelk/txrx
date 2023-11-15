@@ -50,7 +50,7 @@ export default class P2P {
 
     private consumable(): Consumable {
         const startAt = Date.now();
-        
+
         return {
             block: 1000,
             count: 100,
@@ -78,7 +78,7 @@ export default class P2P {
     }
 
     public async hello(parent?: Span): Promise<string | null> {
-        const span = Instrumentation.producer('p2p.tx.hello', parent ?? this.span);
+        const span = Instrumentation.producer('p2p:tx:hello', parent ?? this.span);
         const propagation = Instrumentation.propagate(span);
         const message = {
             stream: process.env.P2P!,
@@ -99,7 +99,7 @@ export default class P2P {
     }
 
     public async init(parent?: Span): Promise<string | null> {
-        const span = Instrumentation.producer('p2p.tx.init', parent ?? this.span);
+        const span = Instrumentation.producer('p2p:tx:init', parent ?? this.span);
         const propagation = Instrumentation.propagate(span);
         const message = {
             stream: process.env.P2P!,
@@ -120,7 +120,7 @@ export default class P2P {
     }
 
     public async share(parent?: Span): Promise<string> {
-        const span = Instrumentation.producer('p2p.tx.share', parent ?? this.span);
+        const span = Instrumentation.producer('p2p:tx:share', parent ?? this.span);
         const propagation = Instrumentation.propagate(span);
         const shard = await Shard.get();
         const message = {

@@ -3,16 +3,12 @@ exporters:
     endpoint: "txrx-jaeger:4317"
     tls:
       insecure: true
-  otlphttp/prometheus:
-    endpoint: "http://txrx-prometheus:9090/api/v1/otlp"
-    tls:
-      insecure: true
 
 service:
   pipelines:
     traces:
       exporters: [otlp, logging, spanmetrics]
     metrics:
-      exporters: [otlphttp/prometheus, logging]
+      exporters: [logging]
     logs:
       exporters: [logging]
