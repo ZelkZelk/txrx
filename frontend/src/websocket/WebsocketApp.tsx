@@ -4,22 +4,14 @@ import { Subscription } from 'rxjs';
 import { IWebSocketApp, WebSocketEventType, WebSocketUpdate } from '../../types/websocket.types';
 import WebSocket from 'isomorphic-ws';
 import { PropsWithChildren } from 'react'
-import { createState } from 'state-pool';
 import Loading from '../backoffice/components/Loading';
 
-const theClient = createState<Client>(null);
-
 export default (props: IWebSocketApp) => {
-    const [client, setClient] = theClient.useState();
-    const [init, setInit] = useState(false);
+    const [client, setClient] = useState<Client>();
     const [open, setOpen] = useState(false);
     const [subscription, setSubscription] = useState<Subscription>();
     const [connection, setConnection] = useState<WebSocket>();
     const propsWithChildren = props as PropsWithChildren<IWebSocketApp>;
-
-    if (!client) {
-        setClient(Client.get(props.url));
-    }
 
     const websocketUpdate = (update: WebSocketUpdate): void => {
         const [type, event] = update;
@@ -39,8 +31,8 @@ export default (props: IWebSocketApp) => {
     };
 
     useEffect(() => {
-        if (!init) {
-            setInit(true);
+        if (!client) {
+            setClient(Client.get(props.url));
         } else {
             if (!subscription) {
                 setSubscription(client.subscribe((update: WebSocketUpdate) => {
@@ -52,7 +44,7 @@ export default (props: IWebSocketApp) => {
                 setOpen(true);
             }
         }
-    }, [init, subscription, connection, open]);
+    }, [client, subscription, connection, open]);
 
     useEffect(() => {
         if (props.tx) {

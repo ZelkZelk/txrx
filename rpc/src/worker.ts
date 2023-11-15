@@ -2,6 +2,8 @@ import { P2PBroadcaster } from 'p2p';
 import { Consumable, ConsumeItem } from 'consumer/types/consumer.types';
 import { Worker as ConsumeWorker } from "consumer";
 import RPC from './rpc';
+import { Instrumentation } from 'telemetry';
+import { Propagation } from 'telemetry/types/telemetry.types';
 
 @P2PBroadcaster(process.env.RPC!)
 export default class Worker extends ConsumeWorker{
@@ -33,6 +35,20 @@ export default class Worker extends ConsumeWorker{
     }
 
     public async consume(item: ConsumeItem): Promise<boolean> {
-        return await this.rpc.handler(item.payload);
+        const propagation: Propagation = {};
+
+        if (Object.hasOwn(item.payload, 'traceparent')) {
+            propagation.traceparent = item.payload.traceparent;
+        }
+
+        if (Object.hasOwn(item.payload, 'tracestate')) {
+            propagation.tracestate = item.payload.tracestate;
+        }
+
+        const span = Instrumentation.producer('rpc:consume', propagation);
+        const result = await this.rpc.handler(item.payload, span);
+        Instrumentation.end(span);
+        
+        return result;
     }
 }

@@ -3,6 +3,8 @@ import { Streamer } from "streamer";
 import { Transmission } from "../types/websocket.types";
 import { Consumable, ConsumeItem } from 'consumer/types/consumer.types';
 import Queue from './queue';
+import { Propagation } from 'telemetry/types/telemetry.types';
+import { Instrumentation } from 'telemetry';
 
 export default class Transceiver extends ConsumerWorker {
     private streamer: Streamer;
@@ -39,14 +41,27 @@ export default class Transceiver extends ConsumerWorker {
     }
 
     public async consume(item: ConsumeItem): Promise<boolean> {
-        const client = this.queue.prepareRx(item);
-  
-        if (client) {
-            if (Object.hasOwn(item.payload, 'data')) {
-                console.info(item.payload.conn, 'rx', item.payload.tx, item.payload.data);
+        const propagation: Propagation = {};
+
+        if (Object.hasOwn(item.payload, 'traceparent')) {
+            propagation.traceparent = item.payload.traceparent;
+        }
+
+        if (Object.hasOwn(item.payload, 'tracestate')) {
+            propagation.tracestate = item.payload.tracestate;
+        }
+
+        if (Object.hasOwn(item.payload, 'data')) {              
+            const client = this.queue.prepareRx(item);
+    
+            if (client) {
+                const [command] = item.payload.data.split(/\s|\n/);
+                const span = Instrumentation.producer(`ws:rx:${command}`, propagation);
                 client.send(item.payload.data);
+                Instrumentation.end(span);
             }
         }
+
 
         return true;
     }

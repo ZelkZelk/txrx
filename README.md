@@ -7,6 +7,7 @@ Containerized stream-based websocket RPC architecture.
 - Node Typescript
 - Redis Streams
 - Docker
+- OpenTelemetry/Jaeger
 
 ## Architecture
 
@@ -86,6 +87,12 @@ flowchart TD
 
 **Note:** by implementing consuming groups, your `rpc` can easily horizontally scale.
 
+# OpenTelemetry and Jaeger
+
+The architecture is fully instrumentalized.
+
+Tracing is implemented out of the box, the opentel collector propagates the traces towards a Jaeger container for visualization.
+
 ## Packages
 
 Each package play a key role in the architecture.
@@ -98,6 +105,7 @@ Each package play a key role in the architecture.
 - **p2p:** the `p2p` network implementation
 - **backend:** boilerplate `rpc handlers`
 - **frontend:** boilerplate `playground` and `backoffice`
+- **telemetry:** opentel support for tracing
 
 ## Boilerplate
 

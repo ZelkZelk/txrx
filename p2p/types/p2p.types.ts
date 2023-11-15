@@ -1,4 +1,5 @@
 import { ConsumeItem } from "consumer/types/consumer.types";
+import Span from "telemetry/src/artifacts/span";
 
 export type P2PMapping = {
     [key:string]: string;
@@ -9,7 +10,7 @@ export type PeerShards = {
 };
 
 export type P2PHandlers = {
-    [key:string]: (item: ConsumeItem) => Promise<void>;
+    [key:string]: (item: ConsumeItem, parent: Span) => Promise<void>;
 };
 
 export enum P2PMode {

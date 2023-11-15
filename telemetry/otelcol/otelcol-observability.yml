@@ -1,0 +1,14 @@
+exporters:
+  otlp:
+    endpoint: "txrx-jaeger:4317"
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      exporters: [otlp, logging, spanmetrics]
+    metrics:
+      exporters: [logging]
+    logs:
+      exporters: [logging]

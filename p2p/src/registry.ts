@@ -3,6 +3,7 @@ import { P2PHandlers } from "../types/p2p.types";
 import * as path from 'path';
 import { promises as fsp } from 'fs';
 import Handler from "./handler";
+import Span from "telemetry/src/artifacts/span";
 
 export default class Registry {
     private static registry: Registry;
@@ -36,11 +37,11 @@ export default class Registry {
         }
     }
 
-    public add(event: string, handler: (item: ConsumeItem) => Promise<void>): void {
+    public add(event: string, handler: (item: ConsumeItem, parent: Span) => Promise<void>): void {
         this.mapping[event] = handler;
     }
 
-    public compute(event: string): (item: ConsumeItem) => Promise<void> | null {
+    public compute(event: string): (item: ConsumeItem, parent: Span) => Promise<void> | null {
         return this.mapping[event];
     }
 }

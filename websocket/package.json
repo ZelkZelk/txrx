@@ -4,19 +4,21 @@
   "description": "Websocket Serve",
   "main": "dist/src/server.js",
   "scripts": {
-    "serve": "node dist/src/server.js",
-    "qa": "npx ts-node qa/client.ts"
+    "serve": "node dist/src/server.js"
   },
   "author": "klez",
   "license": "ISC",
   "devDependencies": {
+    "nodemon": "^3.0.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "@types/ws": "^8.5.4",
+    "consumer": "file:../consumer",
     "redis": "^4.6.7",
     "streamer": "file:../streamer",
-    "consumer": "file:../consumer",
+    "telemetry": "file:../telemetry",
+    "tsyringe": "^4.8.0",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   }

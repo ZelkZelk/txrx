@@ -1,7 +1,8 @@
 import { Payload } from 'consumer/types/consumer.types';
 import { Streamer } from "streamer";
 import Registry from "./registry";
-import { setTimeout } from 'timers/promises'
+import Span from 'telemetry/src/artifacts/span';
+import { Instrumentation } from 'telemetry';
 
 export default class RPC {
     private streamer: Streamer;
@@ -21,7 +22,7 @@ export default class RPC {
         return command;
     }
 
-    public async handler(payload: Payload): Promise<boolean> {
+    public async handler(payload: Payload, parent?: Span): Promise<boolean> {
         if (!Object.hasOwn(payload, 'conn')) {
             return true;
         }
@@ -35,25 +36,33 @@ export default class RPC {
         }
 
         const command = this.getCommand(payload.data);
-        const handler = (await Registry.get()).compute(command);
 
-        if (!handler) {
-            await setTimeout(100);
-            return this.handler(payload);
+        const span = Instrumentation.consumer(`rpc:msg:${command}`, parent);
+        const handler = (await Registry.get()).compute(command);
+        let ack = false;
+
+        if (handler) {
+            span.attr('handler', handler.name);
+
+            const computation = await handler(...[payload.data, payload.conn, payload.tx]);
+            const propagation = Instrumentation.propagate(span);
+    
+            await Promise.all(computation.messages.map(async (message) => {
+                message.payload = {
+                    conn: payload.conn,
+                    tx: payload.tx,
+                    ...message.payload,
+                    ...propagation,
+                };
+    
+                return this.streamer.stream(message);
+            }));
+
+            ack = computation.ack;
         }
 
-        const computation = await handler(...[payload.data, payload.conn, payload.tx]);
+        Instrumentation.end(span);
 
-        await Promise.all(computation.messages.map(async (message) => {
-            message.payload = {
-                conn: payload.conn,
-                tx: payload.tx,
-                ...message.payload,
-            };
-
-            return this.streamer.stream(message);
-        }));
-
-        return computation.ack;
+        return ack;
     }
 }

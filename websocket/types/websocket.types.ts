@@ -1,3 +1,4 @@
+import { Propagation } from "telemetry/types/telemetry.types";
 import { WebSocket } from "ws";
 
 export type ConnectionPool = {
@@ -9,7 +10,7 @@ export type Transmission = {
     tx: string;
     conn: string;
     id?: string;
-};
+} & Propagation;
 
 export type TransmissionPool = {
     [key:string] : {

@@ -5,6 +5,8 @@ import P2P from "../p2p";
 import Shard from "../shard";
 import Peers from "../peers";
 import { P2PMode } from "../../types/p2p.types";
+import Span from "telemetry/src/artifacts/span";
+import { Instrumentation } from "telemetry";
 
 export default class Protocol extends Handler {
     public constructor(url: string) {
@@ -12,7 +14,7 @@ export default class Protocol extends Handler {
     }
 
     @P2PHandler
-    public async hello(item: ConsumeItem): Promise<void> {
+    public async hello(item: ConsumeItem, parent: Span): Promise<void> {
         if (!Object.hasOwn(item.payload, 'peer')) {
             return;
         }
@@ -24,12 +26,12 @@ export default class Protocol extends Handler {
         }
 
         if (p2p.runningAs() === P2PMode.BROADCASTER) {
-            await p2p.share();
+            await p2p.share(parent);
         }
     }
 
     @P2PHandler
-    public async init(item: ConsumeItem): Promise<void> {
+    public async init(item: ConsumeItem, parent: Span): Promise<void> {
         if (!Object.hasOwn(item.payload, 'peer')) {
             return;
         }
@@ -41,15 +43,15 @@ export default class Protocol extends Handler {
         }
 
         if (p2p.runningAs() === P2PMode.BROADCASTER) {
-            await p2p.share();
+            await p2p.share(parent);
         }
         else {
-            await p2p.hello();
+            await p2p.hello(parent);
         }
     }
 
     @P2PHandler
-    public async share(item: ConsumeItem): Promise<void> {
+    public async share(item: ConsumeItem, parent: Span): Promise<void> {
         if (!Object.hasOwn(item.payload, 'shard')) {
             return;
         }
@@ -65,12 +67,22 @@ export default class Protocol extends Handler {
         const current = Object.keys(Peers.get(peer) ?? {});
         const missing = current.filter(event => !events.includes(event));
 
-        for await (const event of missing) {
-            await p2p.del(event);
+        if (missing.length > 0) {
+            const span = Instrumentation.producer('p2p:shard:del', parent);
+            for await (const event of missing) {
+                p2p.del(event);
+            }
+            span.attr('shard', missing);
+            Instrumentation.end(span);
         }
 
-        for await (const event of events) {
-            p2p.add(event, shard[event]);
+        if (events.length > 0) {
+            const span = Instrumentation.producer('p2p:shard:add', parent);
+            for await (const event of events) {
+                p2p.add(event, shard[event]);
+            }
+            span.attr('shard', events);
+            Instrumentation.end(span);
         }
 
         Peers.set(peer, shard);
