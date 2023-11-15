@@ -87,7 +87,7 @@ flowchart TD
 
 **Note:** by implementing consuming groups, your `rpc` can easily horizontally scale.
 
-# OpenTelemetry and Jaeger
+## OpenTelemetry and Jaeger
 
 The architecture is fully instrumentalized.
 
