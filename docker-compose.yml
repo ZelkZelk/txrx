@@ -177,9 +177,6 @@ services:
       - "8000"
       - "--query.base-path"
       - "/jaeger/ui"
-      - "--prometheus.server-url"
-      - "http://txrx-prometheus:9090"
-      - "--prometheus.query.support-spanmetrics-connector=true"
     deploy:
       resources:
         limits:
@@ -190,7 +187,6 @@ services:
       - "4317"                           
     environment:
       - COLLECTOR_OTLP_ENABLED=true
-      - METRICS_STORAGE_TYPE=prometheus
     logging: *logging
     networks:
       - telemetry
@@ -211,7 +207,6 @@ services:
     ports:
       - "4317"          # OTLP over gRPC receiver
       - "4318:4318"     # OTLP over HTTP receiver
-      - "9464"          # Prometheus exporter
       - "8888"          # metrics endpoint
     depends_on:
       - jaeger
