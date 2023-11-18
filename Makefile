@@ -7,43 +7,43 @@ clean:
 	docker system prune -f
 
 node_clean:
-	rm -rf consumer/dist consumer/node_modules
-	rm -rf dispatcher/dist dispatcher/node_modules
-	rm -rf websocket/dist websocket/node_modules
-	rm -rf rpc/dist rpc/node_modules
-	rm -rf streamer/dist streamer/node_modules
-	rm -rf p2p/dist p2p/node_modules
-	rm -rf backend/dist backend/node_modules
-	rm -rf frontend/dist fronted/node_modules
-	rm -rf redis/dist redis/node_modules
-	rm -rf telemetry/dist telemetry/node_modules
+	if [ -d "consumer" ]; then rm -rf consumer/dist consumer/ ; fi
+	if [ -d "dispatcher" ]; then rm -rf dispatcher/dist dispatcher/node_modules ; fi
+	if [ -d "websocket" ]; then rm -rf websocket/dist websocket/node_modules ; fi
+	if [ -d "rpc" ]; then rm -rf rpc/dist rpc/node_modules ; fi
+	if [ -d "streamer" ]; then rm -rf streamer/dist streamer/node_modules ; fi
+	if [ -d "p2p" ]; then rm -rf p2p/dist p2p/node_modules ; fi
+	if [ -d "backend" ]; then rm -rf backend/dist backend/node_modules ; fi
+	if [ -d "frontend" ]; then rm -rf frontend/dist fronted/node_modules ; fi
+	if [ -d "redis" ]; then rm -rf redis/dist redis/node_modules ; fi
+	if [ -d "telemetry" ]; then rm -rf telemetry/dist telemetry/node_modules ; fi
 
 node_install:
-	cd consumer && npm i && cd ..
-	cd dispatcher && npm i && cd ..
-	cd websocket && npm i && cd ..
-	cd rpc && npm i && cd ..
-	cd streamer && npm i && cd ..
-	cd p2p && npm i && cd ..
-	cd backend && npm i && cd ..
-	cd frontend && npm i && cd ..
-	cd redis && npm i && cd ..
-	cd telemetry && npm i && cd ..
+	if [ -d "consumer" ]; then cd consumer && npm i && cd .. ; fi
+	if [ -d "dispatcher" ]; then cd dispatcher && npm i && cd .. ; fi
+	if [ -d "websocket" ]; then cd websocket && npm i && cd .. ; fi
+	if [ -d "rpc" ]; then cd rpc && npm i && cd .. ; fi
+	if [ -d "streamer" ]; then cd streamer && npm i && cd .. ; fi
+	if [ -d "p2p" ]; then cd p2p && npm i && cd .. ; fi
+	if [ -d "backend" ]; then cd backend && npm i && cd .. ; fi
+	if [ -d "frontend" ]; then cd frontend && npm i && cd .. ; fi
+	if [ -d "redis" ]; then cd redis && npm i && cd .. ; fi
+	if [ -d "telemetry" ]; then cd telemetry && npm i && cd .. ; fi
 
 tsc_kill:
 	ps aux | grep -w tsc | grep -v 'grep' |grep -v 'make' | awk '{print $$2}' | xargs -r kill
 
 autoload:
 	make tsc_kill
-	cd telemetry && npx tsc -w &
-	cd redis && npx tsc -w &
-	cd consumer && npx tsc -w &
-	cd streamer && npx tsc -w &
-	cd p2p && npx tsc -w &
-	cd dispatcher && npx tsc -w &
-	cd websocket && npx tsc -w &
-	cd rpc && npx tsc -w &
-	cd backend && npx tsc -w &
+	if [ -d "telemetry" ]; then cd telemetry && npx tsc -w & fi
+	if [ -d "redis" ]; then cd redis && npx tsc -w & fi
+	if [ -d "consumer" ]; then cd consumer && npx tsc -w & fi
+	if [ -d "streamer" ]; then cd streamer && npx tsc -w & fi
+	if [ -d "p2p" ]; then cd p2p && npx tsc -w & fi
+	if [ -d "dispatcher" ]; then cd dispatcher && npx tsc -w & fi
+	if [ -d "websocket" ]; then cd websocket && npx tsc -w & fi
+	if [ -d "rpc" ]; then cd rpc && npx tsc -w & fi
+	if [ -d "backend" ]; then cd backend && npx tsc -w & fi
 	npm i -g nodemon
 	nodemon || true
 	[[ -z "$(jobs -p)" ]] || kill $(jobs -p)
@@ -56,15 +56,15 @@ reload:
 
 tsc:
 	make tsc_kill
-	cd telemetry && npx tsc &
-	cd redis && npx tsc &
-	cd consumer && npx tsc &
-	cd streamer && npx tsc &
-	cd p2p && npx tsc &
-	cd dispatcher && npx tsc &
-	cd websocket && npx tsc &
-	cd rpc && npx tsc &
-	cd backend && npx tsc &
+	if [ -d "telemetry" ]; then cd telemetry && npx tsc & fi
+	if [ -d "redis" ]; then cd redis && npx tsc & fi
+	if [ -d "consumer" ]; then cd consumer && npx tsc & fi
+	if [ -d "streamer" ]; then cd streamer && npx tsc & fi
+	if [ -d "p2p" ]; then cd p2p && npx tsc & fi
+	if [ -d "dispatcher" ]; then cd dispatcher && npx tsc & fi
+	if [ -d "websocket" ]; then cd websocket && npx tsc & fi
+	if [ -d "rpc" ]; then cd rpc && npx tsc & fi
+	if [ -d "backend" ]; then cd backend && npx tsc & fi
 
 stop:
 	docker compose stop
