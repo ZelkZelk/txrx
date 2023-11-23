@@ -33,6 +33,14 @@ node_install:
 tsc_kill:
 	ps aux | grep -w tsc | grep -v 'grep' |grep -v 'make' | awk '{print $$2}' | xargs -r kill
 
+dev:
+	cd txrx 
+	make node_install
+	make tsc
+	cd ..
+	make node_install
+	make tsc
+
 autoload:
 	make tsc_kill
 	if [ -d "telemetry" ]; then cd telemetry && npx tsc -w & fi
@@ -109,7 +117,7 @@ rpc_prod:
 	make rpc_down
 	docker compose up -d --force-recreate --build rpc
 
-rpc_dev:
+rpc_dev: dev
 	@if docker compose ps rpc | grep -qw "txrx-rpc"; then \
         docker compose restart rpc; \
     else \
@@ -132,7 +140,7 @@ rpc-auth_prod:
 	make rpc-auth_down
 	docker compose up -d --force-recreate --build rpc-auth
 
-rpc-auth_dev:
+rpc-auth_dev: dev
 	@if docker compose ps rpc-auth | grep -qw "txrx-rpc-auth"; then \
         docker compose restart rpc-auth; \
     else \
