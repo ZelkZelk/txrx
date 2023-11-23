@@ -14,6 +14,9 @@ export type Identity = {
 export const AUTH_PREFIX = 'AUTH::';
 export const AUTH_TTL = 3_600_000;
 
+export const OTL_PREFIX = 'OTL::';
+export const OTL_TTL = 3_600_000;
+
 export const LOGIN_LOCK_PREFIX = 'LOGIN_LOCK::';
 export const LOGIN_LOCK_TTL = 3_600_000;
 export const LOGIN_LOCK_MAX = 5;
