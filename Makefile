@@ -1,4 +1,4 @@
-.PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres telemetry tsc
+.PHONY: ws dispatcher redis all clean websocket logs data rpc redis-p2p postgres telemetry tsc otelcol
 
 ENV := $(shell echo $$ENV)
 
