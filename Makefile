@@ -2,6 +2,10 @@
 
 ENV := $(shell echo $$ENV)
 
+dev:
+	if [ -d "txrx" ]; then cd txrx && make node_install && make tsc && cd .. ; fi
+	if [ ! -d "txrx" ]; then make node_install && make tsc ; fi
+
 clean:
 	docker compose down --rmi local -v --remove-orphans
 	docker system prune -f
@@ -33,14 +37,6 @@ node_install:
 tsc_kill:
 	ps aux | grep -w tsc | grep -v 'grep' |grep -v 'make' | awk '{print $$2}' | xargs -r kill
 
-dev:
-	cd txrx 
-	make node_install
-	make tsc
-	cd ..
-	make node_install
-	make tsc
-
 autoload:
 	make tsc_kill
 	if [ -d "telemetry" ]; then cd telemetry && npx tsc -w & fi
@@ -59,8 +55,8 @@ autoload:
 reload:
 	make websocket &
 	make dispatcher &
-	make rpc &
-	make rpc-auth &
+	make rpc_restart &
+	make rpc-auth_restart &
 
 tsc:
 	make tsc_kill
