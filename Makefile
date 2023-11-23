@@ -56,15 +56,15 @@ reload:
 
 tsc:
 	make tsc_kill
-	if [ -d "telemetry" ]; then cd telemetry && npx tsc & fi
-	if [ -d "redis" ]; then cd redis && npx tsc & fi
-	if [ -d "consumer" ]; then cd consumer && npx tsc & fi
-	if [ -d "streamer" ]; then cd streamer && npx tsc & fi
-	if [ -d "p2p" ]; then cd p2p && npx tsc & fi
-	if [ -d "dispatcher" ]; then cd dispatcher && npx tsc & fi
-	if [ -d "websocket" ]; then cd websocket && npx tsc & fi
-	if [ -d "rpc" ]; then cd rpc && npx tsc & fi
-	if [ -d "backend" ]; then cd backend && npx tsc & fi
+	if [ -d "telemetry" ]; then cd telemetry && npx tsc ; fi
+	if [ -d "redis" ]; then cd redis && npx tsc ; fi
+	if [ -d "consumer" ]; then cd consumer && npx tsc ; fi
+	if [ -d "streamer" ]; then cd streamer && npx tsc ; fi
+	if [ -d "p2p" ]; then cd p2p && npx tsc ; fi
+	if [ -d "dispatcher" ]; then cd dispatcher && npx tsc ; fi
+	if [ -d "websocket" ]; then cd websocket && npx tsc ; fi
+	if [ -d "rpc" ]; then cd rpc && npx tsc ; fi
+	if [ -d "backend" ]; then cd backend && npx tsc ; fi
 
 stop:
 	docker compose stop
