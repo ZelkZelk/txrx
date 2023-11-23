@@ -45,6 +45,10 @@ export default () => {
                 timeout = setTimeout(() => {
                     setAuth(null);
                     logout(null);
+                    setTx({
+                        message: `logout`,
+                        timestamp: Date.now(),
+                    });
                 }, 1);
                 break;
         }

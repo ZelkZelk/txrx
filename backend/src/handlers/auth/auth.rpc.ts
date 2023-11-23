@@ -78,10 +78,10 @@ export default class Auth extends Handler {
 
     @RPC
     public async authorize(data: string, conn: string): Promise<Computation> {
-        const [_, handle, token] = data.split(' ');
+        const [_, handle, otl] = data.split(' ');
         const messages: string[] = [];
         const user = new User();
-        const authorized: string[] = await user.otl(conn, handle, token);
+        const authorized: string[] = await user.otl(conn, handle, otl);
 
         if (authorized.length > 0) {
             messages.push(['authorized', ...authorized].join(' '));

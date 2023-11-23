@@ -12,10 +12,13 @@ import {
   RESET_LOCK_PREFIX,
   RESET_LOCK_TTL,
   RESET_LOCK_MAX,
-  LoginResult } 
+  LoginResult, 
+  OTL_PREFIX,
+  OTL_TTL} 
 from "../../types/auth.types";
 import { redis, sequelize } from './';
 import * as securePin from "secure-pin";
+import { v4 as uuidv4 } from 'uuid';
 
 export default class User {
   public async login(handle: string, password: string): Promise<string[]> {
@@ -78,47 +81,62 @@ export default class User {
     return redis.del(AUTH_PREFIX + conn);
   }
 
-  public async otl(conn: string, handle: string, token: string): Promise<string[]> {
+  public async otl(conn: string, handle: string, otl: string): Promise<string[]> {
     const canLogin = await this.canLogin(handle);
 
     if(!canLogin) {
       return [];  
     }
 
-    const authorized = await this.whois(token);
+    const token = await redis.get(OTL_PREFIX + otl);
 
-    if (authorized.length > 0) {
-      const [id] = authorized;
-      const user = await this.whoami(id);
+    if (token) {
+      const authorized = await this.whois(token);
 
-      if (user && user.handle === handle) {
-        const expires = Date.now() + AUTH_TTL + '';
-        
-        await redis.multi()
-          .del(AUTH_PREFIX + token)
-          .set(AUTH_PREFIX + conn, authorized.join(' '))
-          .pexpireat(AUTH_PREFIX + conn, expires)
-          .exec();
-
-        authorized.shift();
-        authorized.unshift(conn);
-        authorized.unshift(expires);
+      if (authorized.length > 0) {
+        const [id] = authorized;
+        const user = await this.whoami(id);
+  
+        if (user && user.handle === handle) {
+          const expires = Date.now() + AUTH_TTL + '';
+          const otlExpires = Date.now() + OTL_TTL + '';
+          const otl = uuidv4();
+          
+          await redis.multi()
+            .del(AUTH_PREFIX + token)
+            .del(OTL_PREFIX + otl)
+            .set(AUTH_PREFIX + conn, authorized.join(' '))
+            .pexpireat(AUTH_PREFIX + conn, expires)
+            .set(OTL_PREFIX + otl, conn)
+            .pexpireat(OTL_PREFIX + otl, otlExpires)
+            .exec();
+  
+          authorized.shift();
+          authorized.unshift(otl);
+          authorized.unshift(expires);
+        }
       }
+
+      return authorized;
     }
 
-    return authorized;
+    return [];
   }
 
   public async authorize(conn: string, authorized: string[]): Promise<string[]> {
     const expires = Date.now() + AUTH_TTL + '';
+    const otlExpires = Date.now() + OTL_TTL + '';
+    const otl = uuidv4();
 
     await redis.multi()
         .set(AUTH_PREFIX + conn, authorized.join(' '))
         .pexpireat(AUTH_PREFIX + conn, expires)
+        .set(OTL_PREFIX + otl, conn)
+        .pexpireat(OTL_PREFIX + otl, otlExpires)
         .exec();
 
     authorized.shift();
-    authorized.unshift(conn);
+    authorized.unshift(otl);
     authorized.unshift(expires);
     
     return authorized;
