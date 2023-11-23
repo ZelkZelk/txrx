@@ -117,6 +117,9 @@ rpc_prod:
 	make rpc_down
 	docker compose up -d --force-recreate --build rpc
 
+rpc_restart:
+	docker compose restart rpc
+
 rpc_dev: dev
 	@if docker compose ps rpc | grep -qw "txrx-rpc"; then \
         docker compose restart rpc; \
@@ -139,6 +142,9 @@ endif
 rpc-auth_prod:
 	make rpc-auth_down
 	docker compose up -d --force-recreate --build rpc-auth
+
+rpc-auth_restart:
+	docker compose restart rpc-auth
 
 rpc-auth_dev: dev
 	@if docker compose ps rpc-auth | grep -qw "txrx-rpc-auth"; then \
