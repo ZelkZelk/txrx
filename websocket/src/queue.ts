@@ -83,6 +83,7 @@ export default class Queue {
                     this.ping(conn, now);
                 }
 
+                span.attr('ping', now + '');
                 Instrumentation.end(span);
             }, parseInt(process.env.TTL!) / 2);
         }
@@ -95,12 +96,15 @@ export default class Queue {
         }
     }
 
-    public pong(conn: string, pong: string): void {
+    public pong(conn: string, pong: string): boolean {
         const ping = parseInt(pong.replace(/^pong\s/, ''));
 
         if (ping === this.heartbeats[conn]) {
             delete this.heartbeats[conn];
+            return true;
         }
+
+        return false;
     }
 
     public close(conn: string): void {

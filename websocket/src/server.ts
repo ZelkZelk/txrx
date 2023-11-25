@@ -67,7 +67,10 @@ setImmediate(() => {
 
           if (data.match(/^pong\s\d+/)) {
             span = Instrumentation.producer('ws:pong', messageSpan);
-            queue.pong(conn, data);
+            
+            if(queue.pong(conn, data)) {
+              span.attr('heartbeat', data);
+            }
           }
           else if (queue.throttle(conn)) {
             span = Instrumentation.producer('ws:throttle', messageSpan);
