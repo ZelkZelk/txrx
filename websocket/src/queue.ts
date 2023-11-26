@@ -96,15 +96,15 @@ export default class Queue {
         }
     }
 
-    public pong(conn: string, pong: string): boolean {
+    public pong(conn: string, pong: string): number {
         const ping = parseInt(pong.replace(/^pong\s/, ''));
 
         if (ping === this.heartbeats[conn]) {
             delete this.heartbeats[conn];
-            return true;
+            return ping;
         }
 
-        return false;
+        return null;
     }
 
     public close(conn: string): void {
