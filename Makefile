@@ -4,7 +4,7 @@ ENV := $(shell echo $$ENV)
 
 dev:
 	if [ -d "txrx" ]; then cd txrx && make node_install && make tsc && cd .. ; fi
-	if [ ! -d "txrx" ]; then make node_install && make tsc ; fi
+	make node_install && make tsc
 
 clean:
 	docker compose down --rmi local -v --remove-orphans
@@ -116,7 +116,7 @@ rpc_prod:
 rpc_restart:
 	docker compose restart rpc
 
-rpc_dev:
+rpc_dev: dev
 	@if docker compose ps rpc | grep -qw "txrx-rpc"; then \
         docker compose restart rpc; \
     else \
@@ -142,7 +142,7 @@ rpc-auth_prod:
 rpc-auth_restart:
 	docker compose restart rpc-auth
 
-rpc-auth_dev:
+rpc-auth_dev: dev
 	@if docker compose ps rpc-auth | grep -qw "txrx-rpc-auth"; then \
         docker compose restart rpc-auth; \
     else \
