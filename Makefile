@@ -11,7 +11,7 @@ clean:
 	docker system prune -f
 
 node_clean:
-	if [ -d "consumer" ]; then rm -rf consumer/dist consumer/ ; fi
+	if [ -d "consumer" ]; then rm -rf consumer/dist consumer/node_modules ; fi
 	if [ -d "dispatcher" ]; then rm -rf dispatcher/dist dispatcher/node_modules ; fi
 	if [ -d "websocket" ]; then rm -rf websocket/dist websocket/node_modules ; fi
 	if [ -d "rpc" ]; then rm -rf rpc/dist rpc/node_modules ; fi
@@ -116,7 +116,7 @@ rpc_prod:
 rpc_restart:
 	docker compose restart rpc
 
-rpc_dev: dev
+rpc_dev:
 	@if docker compose ps rpc | grep -qw "txrx-rpc"; then \
         docker compose restart rpc; \
     else \
@@ -142,7 +142,7 @@ rpc-auth_prod:
 rpc-auth_restart:
 	docker compose restart rpc-auth
 
-rpc-auth_dev: dev
+rpc-auth_dev:
 	@if docker compose ps rpc-auth | grep -qw "txrx-rpc-auth"; then \
         docker compose restart rpc-auth; \
     else \
