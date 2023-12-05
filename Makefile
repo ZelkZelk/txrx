@@ -113,12 +113,12 @@ endif
 rpc_prod:
 	make rpc_down
 	for r in $(RPCS); do \
-		docker compose up -d --force-recreate --build $(r) \
+		docker compose up -d --force-recreate --build $$r; \
 	done
 
 rpc_restart:
 	for r in $(RPCS); do \
-		docker compose restart $(r) \
+		docker compose restart $$r; \
 	done
 
 rpc_dev:
@@ -129,17 +129,17 @@ rpc_dev:
 	done
 	for r in $(RPCS); do \
 		if [ ! -z $$(docker compose ps $$r | grep -qw "txrx-$$r") ] ; then \
-			docker compose restart $(r); \
+			docker compose restart $$r; \
 		else \
-			docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d $(r); \
+			docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d $$r; \
 		fi \
 	done
 
 rpc_down:
 	for r in $(RPCS); do \
-		docker compose stop $(r) \
-		docker compose rm $(r) \
-		docker rmi txrx-$(r) \	
+		docker compose stop $$r \
+		docker compose rm $$r \
+		docker rmi txrx-$$r \	
 	done
 
 websocket:
@@ -185,15 +185,10 @@ all:
 	make postgres
 	make services
 
-rpc-all:
-	for r in $(RPCS); do \
-		make $(r) \
-	done
-
 services:
 	make websocket  
 	make dispatcher 
-	make rpc-all    
+	make rpc    
 
 logs:
 	docker compose logs --tail=0 --follow
