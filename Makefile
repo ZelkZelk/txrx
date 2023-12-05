@@ -123,12 +123,12 @@ rpc_restart:
 
 rpc_dev:
 	for r in $(RPCS); do \
-		if [ ! -z $$(docker compose ps $$r | grep -qw "bellota-$$r") ] ; then \
+		if [ ! -z $$(docker compose ps $$r | grep -qw "txrx-$$r") ] ; then \
 			make dev && break; \
 		fi \
 	done
 	for r in $(RPCS); do \
-		if [ ! -z $$(docker compose ps $$r | grep -qw "bellota-$$r") ] ; then \
+		if [ ! -z $$(docker compose ps $$r | grep -qw "txrx-$$r") ] ; then \
 			docker compose restart $(r); \
 		else \
 			docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d $(r); \
@@ -139,7 +139,7 @@ rpc_down:
 	for r in $(RPCS); do \
 		docker compose stop $(r) \
 		docker compose rm $(r) \
-		docker rmi bellota-$(r) \	
+		docker rmi txrx-$(r) \	
 	done
 
 websocket:
