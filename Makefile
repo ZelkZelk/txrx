@@ -92,7 +92,7 @@ dispatcher_prod:
 	docker compose up -d --force-recreate --build dispatcher
 
 dispatcher_dev:
-	@if docker compose ps dispatcher | grep -qw "txrx-dispatcher"; then \
+	@if docker compose ps dispatcher --quiet ; then \
         docker compose restart dispatcher; \
     else \
         docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d dispatcher; \
@@ -123,12 +123,12 @@ rpc_restart:
 
 rpc_dev:
 	for r in $(RPCS); do \
-		if [ ! -z $$(docker compose ps $$r | grep -qw "txrx-$$r") ] ; then \
+		if [ -z $$(docker compose ps $$r --quiet) ] ; then \
 			make dev && break; \
 		fi \
 	done
 	for r in $(RPCS); do \
-		if [ ! -z $$(docker compose ps $$r | grep -qw "txrx-$$r") ] ; then \
+		if [ ! -z $$(docker compose ps $$r --quiet) ] ; then \
 			docker compose restart $$r; \
 		else \
 			docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d $$r; \
@@ -154,7 +154,7 @@ websocket_prod:
 	docker compose up -d --force-recreate --build websocket
 
 websocket_dev:
-	@if docker compose ps websocket | grep -qw "txrx-websocket"; then \
+	@if docker compose ps websocket --quiet ; then \
         docker compose restart websocket; \
     else \
         docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d websocket; \
