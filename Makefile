@@ -2,6 +2,8 @@
 
 ENV := $(shell echo $$ENV)
 
+RPCS = rpc rpc-auth
+
 dev:
 	if [ -d "txrx" ]; then cd txrx && make node_install && make tsc && cd .. ; fi
 	make node_install && make tsc
@@ -55,8 +57,7 @@ autoload:
 reload:
 	make websocket &
 	make dispatcher &
-	make rpc_restart &
-	make rpc-auth_restart &
+	make rpc_restart
 
 tsc:
 	make tsc_kill
@@ -111,48 +112,35 @@ endif
 
 rpc_prod:
 	make rpc_down
-	docker compose up -d --force-recreate --build rpc
+	for r in $(RPCS); do \
+		docker compose up -d --force-recreate --build $(r) \
+	done
 
 rpc_restart:
-	docker compose restart rpc
+	for r in $(RPCS); do \
+		docker compose restart $(r) \
+	done
 
-rpc_dev: dev
-	@if docker compose ps rpc | grep -qw "txrx-rpc"; then \
-        docker compose restart rpc; \
-    else \
-        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d rpc; \
-    fi
+rpc_dev:
+	for r in $(RPCS); do \
+		if [ ! -z $$(docker compose ps $$r | grep -qw "bellota-$$r") ] ; then \
+			make dev && break; \
+		fi \
+	done
+	for r in $(RPCS); do \
+		if [ ! -z $$(docker compose ps $$r | grep -qw "bellota-$$r") ] ; then \
+			docker compose restart $(r); \
+		else \
+			docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d $(r); \
+		fi \
+	done
 
 rpc_down:
-	docker compose stop rpc
-	docker compose rm rpc
-	docker rmi txrx-rpc	
-
-rpc-auth:
-ifeq ($(ENV),production)
-	@make rpc-auth_prod
-else
-	@make rpc-auth_dev
-endif
-
-rpc-auth_prod:
-	make rpc-auth_down
-	docker compose up -d --force-recreate --build rpc-auth
-
-rpc-auth_restart:
-	docker compose restart rpc-auth
-
-rpc-auth_dev: dev
-	@if docker compose ps rpc-auth | grep -qw "txrx-rpc-auth"; then \
-        docker compose restart rpc-auth; \
-    else \
-        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d rpc-auth; \
-    fi
-
-rpc-auth_down:
-	docker compose stop rpc-auth
-	docker compose rm rpc-auth
-	docker rmi txrx-rpc-auth	
+	for r in $(RPCS); do \
+		docker compose stop $(r) \
+		docker compose rm $(r) \
+		docker rmi bellota-$(r) \	
+	done
 
 websocket:
 ifeq ($(ENV),production)
@@ -193,17 +181,19 @@ postgres:
 all:
 	make redis
 	make redis-p2p
-	make services
+	make telemetry
 	make postgres
+	make services
 
 rpc-all:
-	make rpc      
-	make rpc-auth 
+	for r in $(RPCS); do \
+		make $(r) \
+	done
 
 services:
+	make websocket  
 	make dispatcher 
 	make rpc-all    
-	make websocket  
 
 logs:
 	docker compose logs --tail=0 --follow
